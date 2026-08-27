@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import Seo from '../components/Seo';
 import {
   APP_NAME,
   CONTACT_EMAIL,
@@ -43,6 +44,10 @@ const HELP_TOPICS: { question: string; answer: string }[] = [
 export default function Support() {
   return (
     <PageShell title="Support" eyebrow="Help with LocSnap">
+      <Seo
+        title="LocSnap Support - Contact NLR GROUP OF COMPANIES"
+        description="Get help with LocSnap. Contact details, how to report a problem, and answers to common questions about GPS accuracy, offline use and photo storage."
+      />
       <p className="mt-7 text-sm font-light leading-relaxed text-white/70 sm:text-base">
         Get in touch with the {APP_NAME} team for questions about the application, bug reports,
         feature requests or privacy enquiries.

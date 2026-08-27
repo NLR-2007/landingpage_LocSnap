@@ -3,6 +3,17 @@ export const TAGLINE = 'Capture. Locate. Organize.';
 export const DEVELOPER = 'NLR GROUP OF COMPANIES';
 export const LAST_UPDATED = '27 August 2026';
 
+/**
+ * Production origin, used for canonical URLs, Open Graph tags and the sitemap.
+ * PLACEHOLDER: change this to your real domain once the site is deployed.
+ */
+export const SITE_URL = 'https://landingpage-locsnap.vercel.app';
+
+export const SITE_TITLE = 'LocSnap - Offline GPS Camera';
+export const SITE_DESCRIPTION =
+  'Capture GPS-stamped photos with location names, coordinates, timestamps, smart folders, collages and ZIP export. Offline-first and privacy focused.';
+
+
 /** Contact details as supplied by NLR GROUP OF COMPANIES. */
 export const CONTACT_EMAIL = 'nlrgroupofcompany@gmail.com';
 export const CONTACT_PHONE = '6302245307';

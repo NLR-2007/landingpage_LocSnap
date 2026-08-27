@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import Seo from '../components/Seo';
 
 export default function NotFound() {
   return (
     <PageShell title="Page Not Found" eyebrow="404">
+      <Seo title="Page Not Found - LocSnap" noindex />
       <p className="mt-7 text-sm font-light leading-relaxed text-white/70 sm:text-base">
         The page you are looking for does not exist or has moved.
       </p>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import Seo from '../components/Seo';
 import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, SAMPLE_STAMP, TAGLINE } from '../data/locsnap';
 
 const PROBLEMS: { title: string; body: string }[] = [
@@ -55,6 +56,10 @@ const SOLUTIONS: { title: string; body: string }[] = [
 export default function About() {
   return (
     <PageShell title={`About ${APP_NAME}`} eyebrow={TAGLINE}>
+      <Seo
+        title="About LocSnap - Offline GPS Camera by NLR GROUP OF COMPANIES"
+        description="Why LocSnap exists and how it works: GPS-stamped photos with readable addresses and exact coordinates, smart folders, collages and on-device ZIP export."
+      />
       <p className="mt-7 text-sm font-light leading-relaxed text-white/70 sm:text-base">
         {APP_NAME} is an offline-first GPS camera for Android, built by {DEVELOPER}. It exists for
         anyone whose photos need to prove where and when they were taken.

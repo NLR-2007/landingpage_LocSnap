@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import Seo from '../components/Seo';
 import { APP_NAME, CONTACT_EMAIL, DEVELOPER } from '../data/locsnap';
 
 /**
@@ -11,6 +12,10 @@ const PLAY_STORE_URL: string | null = null;
 export default function Download() {
   return (
     <PageShell title="Launching Soon" eyebrow={`Get ${APP_NAME}`}>
+      <Seo
+        title="Download LocSnap - Launching Soon on Android"
+        description="LocSnap is launching soon on Android. The Google Play listing is not published yet; this page will carry the download link as soon as it goes live."
+      />
       <p className="mt-7 text-sm font-light leading-relaxed text-white/70 sm:text-base">
         {APP_NAME} is being prepared for release on Android. The Play Store listing is not published
         yet, so there is no download link to give you today. This page will carry the real link as
