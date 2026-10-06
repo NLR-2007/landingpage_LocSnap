@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { APP_NAME, DEVELOPER } from '../data/locsnap';
 import Footer from './Footer';
-import { NAV_LINKS } from './Navigation';
+import { BrandMark, NAV_LINKS } from './Navigation';
 
 type PageShellProps = {
   title: string;
@@ -12,25 +12,31 @@ type PageShellProps = {
 
 export default function PageShell({ title, eyebrow, children }: PageShellProps) {
   return (
-    <div className="min-h-screen bg-[#010101]">
-      <header className="border-b border-white/[0.08]">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-8">
-          <Link to="/" className="leading-tight transition-opacity duration-300 hover:opacity-70">
-            <span className="block text-sm font-light uppercase tracking-[0.3em] text-white">
-              {APP_NAME}
-            </span>
-            <span className="mt-1 block text-[9px] font-light uppercase tracking-[0.2em] text-white/45 sm:text-[10px]">
-              by {DEVELOPER}
+    <div className="min-h-screen bg-cream">
+      <header className="border-b border-line bg-cream/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-5 sm:px-8">
+          <Link
+            to="/"
+            className="flex items-center gap-3 leading-tight transition-opacity duration-300 hover:opacity-80"
+          >
+            <BrandMark className="h-9 w-9" />
+            <span className="leading-tight">
+              <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-ink">
+                {APP_NAME}
+              </span>
+              <span className="mt-0.5 block text-[9px] font-light uppercase tracking-[0.2em] text-ink/55 sm:text-[10px]">
+                by {DEVELOPER}
+              </span>
             </span>
           </Link>
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-7">
+          <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-1.5 sm:gap-x-7">
             {NAV_LINKS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `whitespace-nowrap text-[10px] font-light uppercase tracking-[0.2em] transition-colors duration-300 hover:text-white sm:text-xs ${
-                    isActive ? 'text-white' : 'text-white/50'
+                  `whitespace-nowrap text-[10px] font-light uppercase tracking-[0.2em] transition-colors duration-300 hover:text-green sm:text-xs ${
+                    isActive ? 'text-green' : 'text-ink/55'
                   }`
                 }
               >
@@ -41,14 +47,14 @@ export default function PageShell({ title, eyebrow, children }: PageShellProps) 
         </div>
       </header>
 
-      <main className="px-5 py-16 sm:px-8 sm:py-24">
+      <main className="brand-wash px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-3xl">
           {eyebrow && (
-            <p className="text-[10px] font-light uppercase tracking-[0.25em] text-white/40 sm:text-xs">
+            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-green sm:text-xs">
               {eyebrow}
             </p>
           )}
-          <h1 className="font-garamond mt-4 text-3xl font-normal leading-[1.1] tracking-tight text-white sm:text-5xl">
+          <h1 className="font-display mt-4 text-3xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
             {title}
           </h1>
           {children}

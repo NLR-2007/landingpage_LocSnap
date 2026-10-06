@@ -17,19 +17,25 @@ export const PRIVACY_POLICY: LegalDocument = {
   id: 'privacy',
   title: 'Privacy Policy',
   intro:
-    'This Privacy Policy applies to the LocSnap Android application and this website. It is written in plain English so you can understand what the application does with your information.',
+    'This Privacy Policy explains how the Geo Snap - NLR Android application (formerly published as LocSnap) and this website, provided by NLR GROUP OF COMPANIES, handle your information. It is written in plain language so that you can clearly understand what the application does, and does not do, with your data. By downloading, installing or using the application, you acknowledge the practices described in this Policy. The effective date is shown at the top of this document.',
   sections: [
     {
       heading: 'Camera Data',
       paragraphs: [
-        'Camera access is required to capture photos. LocSnap does not upload your photos to its own servers for core functionality.',
+        'Camera access is required to capture photos and videos. Geo Snap - NLR does not upload your photos or videos to its own servers for core functionality.',
+      ],
+    },
+    {
+      heading: 'Microphone',
+      paragraphs: [
+        'Microphone access is used only to record audio for videos. Denying it makes recorded clips silent rather than blocking recording. Audio is stored on your device as part of the video and is not transmitted to Geo Snap - NLR.',
       ],
     },
     {
       heading: 'Location Data',
       paragraphs: [
-        'LocSnap may access precise location, approximate location, latitude, longitude, altitude, GPS accuracy and bearing.',
-        'Location information may be embedded directly into exported photographs.',
+        'Geo Snap - NLR may access precise location, approximate location, latitude, longitude, altitude, GPS accuracy and bearing.',
+        'Location information may be rendered into the stamp applied to your photos and videos, and may be written to photo EXIF metadata. This information is processed on your device and is used for the purposes listed below.',
       ],
       list: [
         'To create GPS stamps',
@@ -39,86 +45,103 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
-      heading: 'Device Storage and Photos',
-      paragraphs: ['LocSnap accesses device storage or media only as needed to:'],
+      heading: 'Device Storage and Media',
+      paragraphs: ['Geo Snap - NLR accesses device storage or media only as needed to:'],
       list: [
-        'Save photos',
+        'Save photos and videos',
         'Select images',
         'Create collages',
         'Organize folders',
-        'Export ZIP files',
+        'Export ZIP archives',
+        'Export PDF documents',
         'Share files',
+      ],
+    },
+    {
+      heading: 'Private Vault',
+      paragraphs: [
+        'The optional Private Vault stores captures you move into it in encrypted form on your device. The encryption key is held in the Android Keystore and never leaves the device.',
+        'Vault contents are protected while on the device; however, because the key resides in the Keystore, they do not survive an uninstall. You should remove any content you wish to retain from the vault before uninstalling the application.',
+      ],
+    },
+    {
+      heading: 'Recycle Bin',
+      paragraphs: [
+        'Deleted captures are held in the application’s private recycle bin on your device so that they may be restored. Emptying the recycle bin permanently removes those items and cannot be undone.',
       ],
     },
     {
       heading: 'Local Storage',
       paragraphs: [
-        'LocSnap stores application settings, photo metadata, folder information, cached location information and other required data locally on your device.',
+        'Geo Snap - NLR stores application settings, photo metadata, folder information, cached location information and other required data locally on your device.',
         'Deleting the application may remove application-specific locally stored data. Photos you created that are stored in shared media folders may remain unless you delete them manually.',
       ],
     },
     {
       heading: 'Location Names and Geocoding',
       paragraphs: [
-        'LocSnap may use Android system location and geocoding services to convert GPS coordinates into readable place names and addresses. Some geocoding or map functions may involve third-party services provided by the Android device or a map provider.',
+        'Geo Snap - NLR may use Android system location and geocoding services to convert GPS coordinates into readable place names and addresses. Some geocoding or map functions may involve third-party services provided by the Android device or a map provider.',
         'Availability may depend on network connectivity, device services and geographic coverage.',
       ],
     },
     {
-      heading: 'Mini Maps',
+      heading: 'Map Tiles and Mini-Map',
       paragraphs: [
-        'LocSnap may display map information associated with captured locations. Map providers may receive standard technical requests required to provide map content. This policy will be updated to name the provider once a map provider is implemented.',
+        'Geo Snap - NLR may display a live mini-map and may draw a small map image into the stamp. To render these maps, the application may request map tiles from a third-party map provider.',
+        'Such requests contain only the technical information required to retrieve the relevant map area, such as the coordinates being viewed. No account details, photos or other personal identifiers are sent with these requests. Map providers process these requests under their own privacy policies. Geo Snap - NLR is an independent application and is not affiliated with any map provider.',
       ],
     },
     {
       heading: 'No Account',
-      paragraphs: ['LocSnap currently does not require users to create an account.'],
+      paragraphs: ['Geo Snap - NLR currently does not require users to create an account.'],
     },
     {
-      heading: 'No LocSnap Cloud Storage',
+      heading: 'No Cloud Storage',
       paragraphs: [
-        'LocSnap does not currently provide its own cloud storage service for user photos.',
+        'Geo Snap - NLR does not currently provide its own cloud storage service for user photos or videos. Your captures remain on your device unless you choose to share or export them.',
       ],
     },
     {
       heading: 'No AI Analysis',
-      paragraphs: ['LocSnap does not currently use artificial intelligence to analyze user photos.'],
+      paragraphs: [
+        'Geo Snap - NLR does not currently use artificial intelligence to analyze your photos or videos.',
+      ],
     },
     {
       heading: 'Sharing',
       paragraphs: [
-        'When you choose Share, the Android system sharing interface may send selected photos, ZIP files or other exported content to third-party applications that you select. Those applications have their own privacy policies.',
+        'When you choose Share, the Android system sharing interface may send selected photos, videos, ZIP archives, PDF documents or other exported content to third-party applications that you select. Those applications have their own privacy policies.',
       ],
     },
     {
       heading: 'Advertising',
       paragraphs: [
-        'LocSnap may introduce advertising in future releases. If third-party advertising services such as Google AdMob are introduced, those providers may collect information such as device identifiers, advertising identifiers, approximate location, app interactions and diagnostic data.',
+        'Geo Snap - NLR may introduce advertising in future releases. If third-party advertising services such as Google AdMob are introduced, those providers may collect information such as device identifiers, advertising identifiers, approximate location, app interactions and diagnostic data.',
         'This Privacy Policy will be updated before any such functionality is enabled. Advertising is not currently active.',
       ],
     },
     {
       heading: 'Analytics',
       paragraphs: [
-        'LocSnap does not currently use third-party analytics services unless explicitly disclosed in this Privacy Policy.',
+        'Geo Snap - NLR does not currently use third-party analytics services unless explicitly disclosed in this Privacy Policy.',
       ],
     },
     {
       heading: 'Children and Privacy',
       paragraphs: [
-        'LocSnap is not specifically designed for children under the minimum age required by applicable law, and does not knowingly operate its own system for collecting personal information from children.',
+        'Geo Snap - NLR is not specifically designed for children under the minimum age required by applicable law, and does not knowingly operate its own system for collecting personal information from children.',
       ],
     },
     {
       heading: 'Security',
       paragraphs: [
-        'LocSnap uses reasonable technical practices to protect the data it handles. However, no software or device storage system can guarantee absolute security.',
+        'Geo Snap - NLR uses reasonable technical practices to protect the data it handles, including encrypting Private Vault contents with a key held in the Android Keystore. However, no software or device storage system can guarantee absolute security.',
       ],
     },
     {
       heading: 'Your Control',
       paragraphs: [
-        'You may disable location permission, disable camera permission, remove photos, delete LocSnap data or uninstall the application at any time. Disabling permissions may prevent related features from functioning.',
+        'You may disable location permission, disable camera permission, remove photos, delete Geo Snap - NLR data or uninstall the application at any time. Disabling permissions may prevent related features from functioning.',
       ],
     },
     {
@@ -129,7 +152,9 @@ export const PRIVACY_POLICY: LegalDocument = {
     },
     {
       heading: 'Privacy Contact',
-      paragraphs: [`Privacy questions: ${CONTACT_EMAIL}`],
+      paragraphs: [
+        `If you have any questions or concerns regarding this Privacy Policy or your data, please contact NLR GROUP OF COMPANIES at ${CONTACT_EMAIL}.`,
+      ],
     },
   ],
 };
@@ -138,18 +163,18 @@ export const TERMS: LegalDocument = {
   id: 'terms',
   title: 'Terms & Conditions',
   intro:
-    'By downloading or using LocSnap, you agree to these Terms. Please read them before using the application.',
+    'These Terms & Conditions govern your use of the Geo Snap - NLR Android application (formerly published as LocSnap), provided by NLR GROUP OF COMPANIES. By downloading, installing or using the application, you agree to be bound by these Terms. Please read them carefully before using the application. If you do not agree with these Terms, you should not use the application.',
   sections: [
     {
       heading: 'App Purpose',
-      paragraphs: ['LocSnap provides:'],
+      paragraphs: ['Geo Snap - NLR provides:'],
       list: [
-        'Camera functionality',
-        'GPS stamping',
-        'Location information',
-        'Photo organization',
+        'Photo and video camera functionality',
+        'GPS stamping of location, coordinates, altitude and time',
+        'Location information and a live mini-map',
+        'Photo organization with folders, gallery, recycle bin and an encrypted private vault',
         'Collage generation',
-        'ZIP export',
+        'ZIP and PDF export',
         'Related local-device utilities',
       ],
     },
@@ -157,7 +182,7 @@ export const TERMS: LegalDocument = {
       heading: 'GPS Accuracy Disclaimer',
       paragraphs: [
         'GPS and location information may not always be exact. Accuracy can be affected by satellite visibility, device hardware, buildings, weather and environment, network availability and system location services.',
-        'LocSnap does not guarantee exact geographic accuracy.',
+        'Geo Snap - NLR does not guarantee exact geographic accuracy.',
       ],
     },
     {
@@ -169,12 +194,12 @@ export const TERMS: LegalDocument = {
     {
       heading: 'No Legal Evidence Guarantee',
       paragraphs: [
-        'LocSnap does not guarantee that a GPS-stamped photograph will be accepted as legal, regulatory, insurance or contractual evidence. You are responsible for determining whether LocSnap is suitable for your intended use.',
+        'Geo Snap - NLR does not guarantee that a GPS-stamped photograph will be accepted as legal, regulatory, insurance or contractual evidence. You are responsible for determining whether Geo Snap - NLR is suitable for your intended use.',
       ],
     },
     {
       heading: 'User Responsibility',
-      paragraphs: ['You must not use LocSnap for:'],
+      paragraphs: ['You must not use Geo Snap - NLR for:'],
       list: [
         'Illegal surveillance',
         'Invading privacy',
@@ -188,14 +213,14 @@ export const TERMS: LegalDocument = {
     {
       heading: 'User Content',
       paragraphs: [
-        'You retain ownership of photographs and other content you create using LocSnap. LocSnap does not claim ownership of your photographs.',
+        'You retain ownership of photographs and other content you create using Geo Snap - NLR. Geo Snap - NLR does not claim ownership of your photographs.',
       ],
     },
     {
       heading: 'Local Data Responsibility',
       paragraphs: [
-        'Because LocSnap is primarily device-based, you are responsible for maintaining appropriate backups of important photos and exported files.',
-        'Subject to applicable law, LocSnap is not responsible for loss caused by device damage, storage failure, accidental deletion, operating system issues, uninstalling applications or third-party apps.',
+        'Because Geo Snap - NLR is primarily device-based, you are responsible for maintaining appropriate backups of important photos and exported files.',
+        'Subject to applicable law, Geo Snap - NLR is not responsible for loss caused by device damage, storage failure, accidental deletion, operating system issues, uninstalling applications or third-party apps.',
       ],
     },
     {
@@ -207,20 +232,20 @@ export const TERMS: LegalDocument = {
     {
       heading: 'Availability',
       paragraphs: [
-        'LocSnap may change, improve, add or remove features over time. The application is provided subject to availability.',
+        'Geo Snap - NLR may change, improve, add or remove features over time. The application is provided subject to availability.',
       ],
     },
     {
       heading: 'Intellectual Property',
       paragraphs: [
-        'The LocSnap name, application interface, logo and original application materials are owned or controlled by their respective developer or rights holder.',
-        'You may not copy the application, redistribute proprietary assets, reverse engineer it where prohibited by law, or falsely represent yourself as LocSnap.',
+        'The Geo Snap - NLR name, application interface, logo and original application materials are owned or controlled by their respective developer or rights holder.',
+        'You may not copy the application, redistribute proprietary assets, reverse engineer it where prohibited by law, or falsely represent yourself as Geo Snap - NLR.',
       ],
     },
     {
       heading: 'Warranty Disclaimer',
       paragraphs: [
-        'LocSnap is provided on an "as available" basis to the maximum extent permitted by applicable law.',
+        'Geo Snap - NLR is provided on an "as available" basis to the maximum extent permitted by applicable law.',
       ],
     },
     {
@@ -237,7 +262,9 @@ export const TERMS: LegalDocument = {
     },
     {
       heading: 'Terms Contact',
-      paragraphs: [`Questions regarding these Terms: ${CONTACT_EMAIL}`],
+      paragraphs: [
+        `If you have any questions regarding these Terms & Conditions, please contact NLR GROUP OF COMPANIES at ${CONTACT_EMAIL}.`,
+      ],
     },
   ],
 };

@@ -13,10 +13,10 @@ export default function Download() {
   return (
     <PageShell title="Launching Soon" eyebrow={`Get ${APP_NAME}`}>
       <Seo
-        title="Download LocSnap - Launching Soon on Android"
-        description="LocSnap is launching soon on Android. The Google Play listing is not published yet; this page will carry the download link as soon as it goes live."
+        title="Download Geo Snap - NLR - Launching Soon on Android"
+        description="Geo Snap - NLR is launching soon on Android. The Google Play listing is not published yet; this page will carry the download link as soon as it goes live."
       />
-      <p className="mt-7 text-sm font-light leading-relaxed text-white/70 sm:text-base">
+      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
         {APP_NAME} is being prepared for release on Android. The Play Store listing is not published
         yet, so there is no download link to give you today. This page will carry the real link as
         soon as it is live.
@@ -28,7 +28,7 @@ export default function Download() {
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noreferrer"
-            className="liquid-glass inline-block rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-white/90"
+            className="liquid-glass inline-block rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-ink/80"
           >
             Get it on Google Play
           </a>
@@ -37,22 +37,22 @@ export default function Download() {
             type="button"
             disabled
             aria-disabled="true"
-            className="liquid-glass cursor-not-allowed rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-white/45"
+            className="liquid-glass cursor-not-allowed rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-ink/55"
           >
             Launching Soon
           </button>
         )}
       </div>
 
-      <div className="mt-16 border-t border-white/[0.08] pt-10">
-        <h2 className="text-xs font-light uppercase tracking-[0.2em] text-white/90">
+      <div className="mt-16 border-t border-line pt-10">
+        <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           Want to know when it launches?
         </h2>
-        <p className="mt-4 text-sm font-light leading-relaxed text-white/60">
+        <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
           There is no mailing list yet. Email{' '}
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="break-all text-white/85 underline underline-offset-4 hover:text-white"
+            className="break-all text-ink/80 underline underline-offset-4 hover:text-ink"
           >
             {CONTACT_EMAIL}
           </a>{' '}
@@ -61,28 +61,29 @@ export default function Download() {
       </div>
 
       <div className="mt-14">
-        <h2 className="text-xs font-light uppercase tracking-[0.2em] text-white/90">
+        <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           What to expect
         </h2>
         <ul className="mt-4 space-y-2">
           {[
-            'Android application',
-            'GPS stamped photos with readable address and coordinates',
-            'Smart folders, collages and ZIP export',
-            'No account required and no LocSnap cloud storage',
+            'Android 7.0 (API 24) and newer',
+            'GPS-stamped photos and video with readable address, coordinates, altitude and time',
+            'Smart folders, gallery, recycle bin and an encrypted private vault',
+            'Live mini-map, collages and on-device ZIP or PDF export',
+            'No account required and no Geo Snap - NLR cloud storage',
           ].map((item) => (
-            <li key={item} className="flex gap-3 text-sm font-light leading-relaxed text-white/55">
-              <span aria-hidden="true" className="text-white/25">
+            <li key={item} className="flex gap-3 text-sm font-normal leading-relaxed text-ink/65">
+              <span aria-hidden="true" className="text-ink/40">
                 —
               </span>
               {item}
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm font-light leading-relaxed text-white/50">
+        <p className="mt-6 text-sm font-normal leading-relaxed text-ink/55">
           {APP_NAME} is designed to keep advertising minimal and non-intrusive if advertising is
           introduced in future versions. The{' '}
-          <Link to="/privacy" className="text-white/80 underline underline-offset-4 hover:text-white">
+          <Link to="/privacy" className="text-ink/70 underline underline-offset-4 hover:text-ink">
             Privacy Policy
           </Link>{' '}
           will be updated before any such functionality is enabled.

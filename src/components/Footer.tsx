@@ -7,6 +7,7 @@ import {
   DEVELOPER,
   TAGLINE,
 } from '../data/locsnap';
+import { BrandMark } from './Navigation';
 
 const NAV = [
   { label: 'Home', to: '/' },
@@ -19,34 +20,37 @@ const NAV = [
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/[0.08] bg-[#010101] px-5 py-16 sm:px-8 sm:py-20">
+    <footer className="relative border-t border-line bg-[#EFEBDD] px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-5xl">
         <div className="grid gap-12 sm:grid-cols-2">
           <div>
-            <p className="font-light uppercase tracking-[0.3em] text-white">{APP_NAME}</p>
-            <p className="mt-3 text-xs font-light uppercase tracking-[0.2em] text-white/40">
+            <div className="flex items-center gap-3">
+              <BrandMark className="h-9 w-9" />
+              <p className="font-semibold uppercase tracking-[0.18em] text-ink">{APP_NAME}</p>
+            </div>
+            <p className="mt-3 text-xs font-light uppercase tracking-[0.2em] text-ink/50">
               {TAGLINE}
             </p>
 
             <div className="mt-8 space-y-4">
               <div>
-                <p className="text-[10px] font-light uppercase tracking-[0.2em] text-white/40">
+                <p className="text-[10px] font-light uppercase tracking-[0.2em] text-ink/50">
                   Email
                 </p>
                 <a
                   href={`mailto:${CONTACT_EMAIL}`}
-                  className="mt-1 block break-all text-sm font-light text-white/70 transition-colors duration-300 hover:text-white"
+                  className="mt-1 block break-all text-sm font-light text-ink/80 transition-colors duration-300 hover:text-green"
                 >
                   {CONTACT_EMAIL}
                 </a>
               </div>
               <div>
-                <p className="text-[10px] font-light uppercase tracking-[0.2em] text-white/40">
+                <p className="text-[10px] font-light uppercase tracking-[0.2em] text-ink/50">
                   Phone
                 </p>
                 <a
                   href={CONTACT_PHONE_HREF}
-                  className="mt-1 block text-sm font-light text-white/70 transition-colors duration-300 hover:text-white"
+                  className="mt-1 block text-sm font-light text-ink/80 transition-colors duration-300 hover:text-green"
                 >
                   {CONTACT_PHONE}
                 </a>
@@ -59,7 +63,7 @@ export default function Footer() {
               <Link
                 key={item.to}
                 to={item.to}
-                className="text-xs font-light uppercase tracking-[0.2em] text-white/60 transition-colors duration-300 hover:text-white"
+                className="text-xs font-light uppercase tracking-[0.2em] text-ink/70 transition-colors duration-300 hover:text-green"
               >
                 {item.label}
               </Link>
@@ -67,15 +71,16 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="mt-16 border-t border-white/[0.08] pt-8">
-          <p className="text-xs font-light uppercase tracking-[0.25em] text-white/80">
+        <div className="mt-16 border-t border-line pt-8">
+          <p className="text-xs font-light uppercase tracking-[0.25em] text-ink/70">
             Developed by {DEVELOPER}
           </p>
-          <p className="mt-4 text-xs font-light text-white/35">
+          <p className="mt-4 text-xs font-light text-ink/45">
             &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </p>
-          <p className="mt-2 text-xs font-light text-white/35">
-            {APP_NAME} is an independent application and is not affiliated with Google Maps.
+          <p className="mt-2 text-xs font-light text-ink/45">
+            {APP_NAME} (formerly LocSnap) is an independent application and is not affiliated with
+            Google Maps.
           </p>
         </div>
       </div>
