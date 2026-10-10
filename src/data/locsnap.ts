@@ -4,7 +4,7 @@ export const FORMER_NAME = 'LocSnap';
 export const TAGLINE = 'Capture. Locate. Prove.';
 export const DEVELOPER = 'NLR GROUP OF COMPANIES';
 export const PACKAGE_ID = 'com.nlrgroup.locsnap';
-export const LAST_UPDATED = '5 October 2026';
+export const LAST_UPDATED = '10 October 2026';
 
 /**
  * Production origin, used for canonical URLs, Open Graph tags and the sitemap.
@@ -108,12 +108,12 @@ export const AUDIENCES: { title: string; body: string }[] = [
 
 export const SAMPLE_STAMP = {
   place: 'Hyderabad, Telangana, India 🇮🇳',
-  address: ['ALEAP Industrial Area, Gajularamaram,', 'Hyderabad, Telangana 500043,', 'India'],
-  lat: 'Lat 17.547379°',
-  long: 'Long 78.403747°',
-  altitude: 'Altitude 546.7 m',
-  heading: 'NE 65°',
-  accuracy: 'GPS ±48.9 m',
-  date: 'Thursday, 27/08/2026',
-  time: '09:55 AM GMT +05:30',
+  address: ['Chaitanya College Rd, Kavya Avenue,', 'Ameenpur, Bachupally,', 'Hyderabad, Telangana 500043'],
+  lat: 'Lat 17.547357°',
+  long: 'Long 78.401288°',
+  altitude: 'Altitude 546.5 m',
+  heading: 'N 357°',
+  accuracy: 'GPS ±3.4 m',
+  date: 'Monday, 05/10/2026',
+  time: '05:44 PM GMT +05:30',
 };

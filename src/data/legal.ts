@@ -114,10 +114,10 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
-      heading: 'Advertising',
+      heading: 'Advertising and Cross-Promotion',
       paragraphs: [
-        'Geo Snap - NLR may introduce advertising in future releases. If third-party advertising services such as Google AdMob are introduced, those providers may collect information such as device identifiers, advertising identifiers, approximate location, app interactions and diagnostic data.',
-        'This Privacy Policy will be updated before any such functionality is enabled. Advertising is not currently active.',
+        'Geo Snap - NLR may display promotional content for other products offered by NLR GROUP OF COMPANIES ("house ads"). This content is bundled with the application and shown on your device; it is not served by a third-party advertising network, it uses no advertising identifiers, and it does not track you. Selecting such a promotion opens the relevant product page in your browser, after which that website’s own privacy policy applies.',
+        'Geo Snap - NLR does not currently use third-party advertising services. If a third-party advertising service such as Google AdMob is introduced in a future release, those providers may collect information such as device identifiers, advertising identifiers, approximate location, app interactions and diagnostic data. This Privacy Policy will be updated before any such functionality is enabled.',
       ],
     },
     {

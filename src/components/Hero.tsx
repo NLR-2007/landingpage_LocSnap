@@ -8,9 +8,9 @@ import { SAMPLE_STAMP } from '../data/locsnap';
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen w-full flex-col overflow-hidden bg-cream">
-      {/* Soft warm background with gentle green + cyan tints and a faint grid. */}
+      {/* Soft warm background with gentle teal + cyan brand tints and a faint grid. */}
       <div
-        className="absolute inset-0 bg-[radial-gradient(85%_55%_at_50%_-10%,rgba(47,166,79,0.12),transparent_60%)]"
+        className="absolute inset-0 bg-[radial-gradient(85%_55%_at_50%_-10%,rgba(14,124,145,0.12),transparent_60%)]"
         aria-hidden="true"
       />
       <div

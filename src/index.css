@@ -49,7 +49,7 @@ body {
 
 .liquid-glass:hover {
   background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(30, 142, 62, 0.35);
+  border-color: rgba(14, 124, 145, 0.35);
   box-shadow: 0 6px 20px -8px rgba(27, 30, 34, 0.18);
 }
 
@@ -57,17 +57,17 @@ body {
   transform: scale(0.98);
 }
 
-/* Solid green call-to-action, matching the in-app primary button. */
+/* Solid teal call-to-action, matching the in-app primary button. */
 .btn-brand {
-  background: linear-gradient(180deg, #2fa64f 0%, #1e8e3e 100%);
+  background: linear-gradient(180deg, #12a0b8 0%, #0e7c91 100%);
   color: #ffffff;
-  box-shadow: 0 10px 30px -10px rgba(30, 142, 62, 0.55);
+  box-shadow: 0 10px 30px -10px rgba(14, 124, 145, 0.55);
   transition: transform 150ms ease, box-shadow 300ms ease, filter 200ms ease;
 }
 
 .btn-brand:hover {
   filter: brightness(1.05);
-  box-shadow: 0 12px 38px -10px rgba(30, 142, 62, 0.65);
+  box-shadow: 0 12px 38px -10px rgba(14, 124, 145, 0.65);
 }
 
 .btn-brand:active {
