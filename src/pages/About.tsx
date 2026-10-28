@@ -93,12 +93,12 @@ const COMPARISON: { label: string; us: string; them: string }[] = [
 
 export default function About() {
   return (
-    <PageShell title={`About ${APP_NAME}`} eyebrow={TAGLINE}>
+    <PageShell title={`About ${APP_NAME}`} eyebrow={TAGLINE} wide>
       <Seo
         title="About Geo Snap - NLR - Offline GPS Camera by NLR GROUP OF COMPANIES"
         description="Why Geo Snap - NLR exists and how it works: GPS-stamped photos and video with readable addresses, coordinates and altitude, smart folders, a private vault, collages and on-device ZIP or PDF export."
       />
-      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
+      <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
         {APP_NAME} is an offline-first GPS camera for Android, built by {DEVELOPER}. It exists for
         anyone whose photos need to prove where and when they were taken.
       </p>
@@ -111,7 +111,7 @@ export default function About() {
         <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           A photo without a place is only half a record
         </h2>
-        <div className="mt-8 space-y-8">
+        <div className="mt-8 grid gap-x-12 gap-y-8 lg:grid-cols-2">
           {PROBLEMS.map((item, i) => (
             <div key={item.title} className="flex gap-5">
               <span className="mt-1 text-[10px] font-light tracking-[0.2em] text-ink/40">
@@ -136,7 +136,7 @@ export default function About() {
         <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           How {APP_NAME} answers it
         </h2>
-        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
+        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {SOLUTIONS.map((item) => (
             <article key={item.title} className="bg-card p-7">
               <h3 className="font-display text-xl font-medium tracking-tight text-ink">
@@ -153,7 +153,7 @@ export default function About() {
         <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           Everything you need in one camera
         </h2>
-        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
+        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature) => (
             <article key={feature.title} className="bg-card p-7">
               <h3 className="font-display text-xl font-medium tracking-tight text-ink">
@@ -187,7 +187,7 @@ export default function About() {
         <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           More than just coordinates
         </h2>
-        <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
+        <p className="mt-4 max-w-3xl text-sm font-normal leading-relaxed text-ink/70">
           {APP_NAME} combines readable location information with exact GPS coordinates, altitude and
           heading, so your photos and videos are easier to understand and organize.
         </p>
@@ -249,7 +249,7 @@ export default function About() {
         <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           Who it is for
         </h2>
-        <div className="mt-8 grid gap-8 sm:grid-cols-2">
+        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {AUDIENCES.map((audience) => (
             <div key={audience.title}>
               <h3 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
@@ -271,13 +271,13 @@ export default function About() {
         <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
           How it is different
         </h2>
-        <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
+        <p className="mt-4 max-w-3xl text-sm font-normal leading-relaxed text-ink/70">
           Most GPS-camera apps are ad-supported and tracker-heavy, and charge a subscription to
           remove the ads. {APP_NAME} takes the opposite approach: private by design, free, and built
           to organise your work — not to monetise your data.
         </p>
 
-        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
+        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {DIFFERENTIATORS.map((item) => (
             <article key={item.title} className="bg-card p-7">
               <h3 className="font-display text-xl font-medium tracking-tight text-ink">
@@ -332,7 +332,7 @@ export default function About() {
         <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
           Developed by {DEVELOPER}
         </h2>
-        <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
+        <p className="mt-4 max-w-3xl text-sm font-normal leading-relaxed text-ink/70">
           {APP_NAME} is developed and maintained by {DEVELOPER}. Read the{' '}
           <Link to="/privacy" className="text-ink/80 underline underline-offset-4 hover:text-ink">
             Privacy Policy

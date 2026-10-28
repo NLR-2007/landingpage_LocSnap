@@ -10,9 +10,11 @@ type PageShellProps = {
   title: string;
   eyebrow?: string;
   children: ReactNode;
+  /** Content-heavy pages (e.g. About) use the wide column; reading pages stay narrow. */
+  wide?: boolean;
 };
 
-export default function PageShell({ title, eyebrow, children }: PageShellProps) {
+export default function PageShell({ title, eyebrow, children, wide = false }: PageShellProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -96,7 +98,7 @@ export default function PageShell({ title, eyebrow, children }: PageShellProps) 
       </header>
 
       <main className="brand-wash px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-3xl">
+        <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
           {eyebrow && (
             <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-green sm:text-xs">
               {eyebrow}
