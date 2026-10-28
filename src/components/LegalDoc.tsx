@@ -7,7 +7,7 @@ type LegalDocProps = {
 export default function LegalDoc({ doc }: LegalDocProps) {
   return (
     <>
-      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
+      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 text-justify hyphens-auto sm:text-base">
         {doc.intro}
       </p>
 
@@ -18,7 +18,7 @@ export default function LegalDoc({ doc }: LegalDocProps) {
               {section.heading}
             </h2>
             {section.paragraphs?.map((paragraph) => (
-              <p key={paragraph} className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
+              <p key={paragraph} className="mt-4 text-sm font-normal leading-relaxed text-ink/70 text-justify hyphens-auto">
                 {paragraph}
               </p>
             ))}

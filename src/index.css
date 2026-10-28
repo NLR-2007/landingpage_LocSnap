@@ -20,6 +20,17 @@ body {
   font-family: 'Space Grotesk', 'Geist', sans-serif;
 }
 
+/*
+ * Reading paragraphs on the content pages (About, Privacy, Terms, Support, Download) are justified
+ * for clean, block-aligned text. Scoped to <main> and to paragraphs that carry leading-relaxed, so
+ * headings, eyebrow labels, list items, links and the Home hero are left untouched.
+ */
+main p.leading-relaxed {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 /* Soft warm wash with a faint cyan/green tint behind hero and section headers. */
 .brand-wash {
   background:
