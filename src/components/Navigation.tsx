@@ -29,7 +29,7 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="relative z-20 flex items-center justify-between px-5 py-6 sm:px-8 md:justify-center md:gap-10 lg:gap-14">
+      <nav className="relative z-20 flex items-center justify-between px-5 py-6 sm:px-8 lg:justify-center lg:gap-10 xl:gap-14">
         <Link to="/" className="group flex items-center gap-2.5 leading-tight">
           <BrandMark />
           <span className="leading-tight">
@@ -42,7 +42,7 @@ export default function Navigation() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-6 lg:gap-9">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-9">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
@@ -59,7 +59,7 @@ export default function Navigation() {
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
-          className="md:hidden text-ink/80 transition-colors duration-300 hover:text-ink"
+          className="lg:hidden text-ink/80 transition-colors duration-300 hover:text-ink"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -73,7 +73,7 @@ export default function Navigation() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="mobile-menu-glass fixed left-4 right-4 top-16 z-50 flex flex-col items-center gap-5 rounded-2xl py-8 md:hidden"
+            className="mobile-menu-glass fixed left-4 right-4 top-16 z-50 flex flex-col items-center gap-5 rounded-2xl py-8 lg:hidden"
           >
             {NAV_LINKS.map((link, i) => (
               <motion.div
