@@ -53,6 +53,44 @@ const SOLUTIONS: { title: string; body: string }[] = [
   },
 ];
 
+const DIFFERENTIATORS: { title: string; body: string }[] = [
+  {
+    title: 'No ads, no trackers, no account',
+    body: `Most GPS-camera apps run third-party ad networks and bundle trackers that collect your advertising ID, IP address and location. ${APP_NAME} has none — no ad SDK, no analytics, no cross-app tracking and no sign-in. The only outbound request is a coordinate for map tiles and address lookup.`,
+  },
+  {
+    title: 'Free, not paywalled',
+    body: 'Core capture and features are free. Similar apps typically charge weekly, monthly or lifetime subscriptions just to remove their ads.',
+  },
+  {
+    title: 'An organiser, not just a stamp',
+    body: "Folders, a gallery, a recycle bin, collages that keep every photo's stamp, and on-device ZIP or PDF export. Most GPS-camera apps stop at the overlay.",
+  },
+  {
+    title: 'A removable stamp',
+    body: 'The Geo Tag Manager can take the stamp off a photo later without cropping it. Most apps bake the overlay in permanently.',
+  },
+  {
+    title: 'Private vault and real templates',
+    body: 'An encrypted on-device vault (Android Keystore, unlocked by fingerprint or PIN) and five stamp templates with a live visual picker — both rare in this category.',
+  },
+  {
+    title: 'Built on a modern, lean stack',
+    body: 'Kotlin, Jetpack Compose, CameraX and on-device encryption, with no advertising or analytics SDKs weighing it down — a lighter, faster, more private build.',
+  },
+];
+
+const COMPARISON: { label: string; us: string; them: string }[] = [
+  { label: 'Capture works offline', us: 'Always — shutter never blocked', them: 'Varies' },
+  { label: 'Third-party ads & trackers', us: 'None', them: 'Common' },
+  { label: 'Account or cloud required', us: 'No', them: 'Often' },
+  { label: 'Pay to remove ads', us: 'Never', them: 'Subscriptions' },
+  { label: 'Remove the stamp later', us: 'Yes, without cropping', them: 'Usually permanent' },
+  { label: 'Stamp templates', us: 'Five, with live preview', them: 'Usually one' },
+  { label: 'Folders, collage & export', us: 'Built in, on-device', them: 'Limited' },
+  { label: 'Encrypted private vault', us: 'Yes', them: 'Rare' },
+];
+
 export default function About() {
   return (
     <PageShell title={`About ${APP_NAME}`} eyebrow={TAGLINE}>
@@ -222,6 +260,70 @@ export default function About() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Why different */}
+      <section className="mt-20 border-t border-line pt-16">
+        <p className="text-[10px] font-light uppercase tracking-[0.25em] text-ink/50 sm:text-xs">
+          Why {APP_NAME}
+        </p>
+        <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
+          How it is different
+        </h2>
+        <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
+          Most GPS-camera apps are ad-supported and tracker-heavy, and charge a subscription to
+          remove the ads. {APP_NAME} takes the opposite approach: private by design, free, and built
+          to organise your work — not to monetise your data.
+        </p>
+
+        <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
+          {DIFFERENTIATORS.map((item) => (
+            <article key={item.title} className="bg-card p-7">
+              <h3 className="font-display text-xl font-medium tracking-tight text-ink">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-sm font-normal leading-relaxed text-ink/70">{item.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-10 overflow-x-auto rounded-2xl border border-line">
+          <table className="w-full min-w-[520px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="bg-[#EFEBDD]">
+                <th className="p-4 text-xs font-light uppercase tracking-[0.15em] text-ink/60">
+                  Feature
+                </th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-[0.15em] text-green">
+                  {APP_NAME}
+                </th>
+                <th className="p-4 text-xs font-light uppercase tracking-[0.15em] text-ink/50">
+                  Typical GPS-camera app
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON.map((row, i) => (
+                <tr key={row.label} className={i % 2 === 0 ? 'bg-card' : 'bg-cream'}>
+                  <td className="p-4 text-ink/70">{row.label}</td>
+                  <td className="p-4 font-medium text-ink">{row.us}</td>
+                  <td className="p-4 text-ink/50">{row.them}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-green/30 bg-green/5 p-7">
+          <p className="text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
+            Every other GPS-camera app pays its bills with ads and trackers and charges you to remove
+            them.{' '}
+            <span className="font-semibold text-ink">
+              {APP_NAME} has no ads, no trackers and no account — your photos and location stay on
+              your device, free.
+            </span>
+          </p>
         </div>
       </section>
 
