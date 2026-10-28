@@ -6,7 +6,7 @@ import { LAST_UPDATED } from '../data/locsnap';
 
 export default function Terms() {
   return (
-    <PageShell title={TERMS.title} eyebrow={`Last Updated: ${LAST_UPDATED}`}>
+    <PageShell title={TERMS.title} eyebrow={`Last Updated: ${LAST_UPDATED}`} wide>
       <Seo
         title={'Geo Snap - NLR Terms & Conditions'}
         description="The terms for using Geo Snap - NLR, including GPS and address accuracy disclaimers, user responsibilities, content ownership and limitation of liability."

@@ -11,12 +11,12 @@ const PLAY_STORE_URL: string | null = null;
 
 export default function Download() {
   return (
-    <PageShell title="Launching Soon" eyebrow={`Get ${APP_NAME}`}>
+    <PageShell title="Launching Soon" eyebrow={`Get ${APP_NAME}`} wide>
       <Seo
         title="Download Geo Snap - NLR - Launching Soon on Android"
         description="Geo Snap - NLR is launching soon on Android. The Google Play listing is not published yet; this page will carry the download link as soon as it goes live."
       />
-      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
+      <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
         {APP_NAME} is being prepared for release on Android. The Play Store listing is not published
         yet, so there is no download link to give you today. This page will carry the real link as
         soon as it is live.
@@ -44,7 +44,7 @@ export default function Download() {
         )}
       </div>
 
-      <div className="mt-16 border-t border-line pt-10">
+      <div className="mt-16 max-w-3xl border-t border-line pt-10">
         <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           Want to know when it launches?
         </h2>
@@ -64,7 +64,7 @@ export default function Download() {
         <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           What to expect
         </h2>
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 grid gap-x-10 gap-y-2 sm:grid-cols-2">
           {[
             'Android 7.0 (API 24) and newer',
             'GPS-stamped photos and video with readable address, coordinates, altitude and time',
@@ -80,7 +80,7 @@ export default function Download() {
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm font-normal leading-relaxed text-ink/55">
+        <p className="mt-6 max-w-3xl text-sm font-normal leading-relaxed text-ink/55">
           {APP_NAME} is designed to keep advertising minimal and non-intrusive if advertising is
           introduced in future versions. The{' '}
           <Link to="/privacy" className="text-ink/70 underline underline-offset-4 hover:text-ink">

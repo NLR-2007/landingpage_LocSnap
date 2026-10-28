@@ -53,12 +53,12 @@ const HELP_TOPICS: { question: string; answer: string }[] = [
 
 export default function Support() {
   return (
-    <PageShell title="Support" eyebrow="Help with Geo Snap - NLR">
+    <PageShell title="Support" eyebrow="Help with Geo Snap - NLR" wide>
       <Seo
         title="Geo Snap - NLR Support - Contact NLR GROUP OF COMPANIES"
         description="Get help with Geo Snap - NLR. Contact details, how to report a problem, and answers to common questions about GPS accuracy, offline use and photo storage."
       />
-      <p className="mt-7 text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
+      <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
         Get in touch with the {APP_NAME} team for questions about the application, bug reports,
         feature requests or privacy enquiries.
       </p>
@@ -92,7 +92,7 @@ export default function Support() {
       </div>
 
       {/* What to include */}
-      <div className="mt-14">
+      <div className="mt-14 max-w-3xl">
         <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           Reporting a problem
         </h2>
@@ -122,7 +122,7 @@ export default function Support() {
         <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
           Common questions
         </h2>
-        <div className="mt-8 space-y-10">
+        <div className="mt-8 grid gap-x-12 gap-y-10 lg:grid-cols-2">
           {HELP_TOPICS.map((topic) => (
             <div key={topic.question}>
               <h3 className="font-display text-xl font-medium tracking-tight text-ink sm:text-2xl">
@@ -138,7 +138,7 @@ export default function Support() {
 
       {/* Legal links */}
       <div className="mt-16 border-t border-line pt-10">
-        <p className="text-sm font-normal leading-relaxed text-ink/70">
+        <p className="max-w-3xl text-sm font-normal leading-relaxed text-ink/70">
           For details on how {APP_NAME} handles your data, read the{' '}
           <Link to="/privacy" className="text-ink/80 underline underline-offset-4 hover:text-ink">
             Privacy Policy
