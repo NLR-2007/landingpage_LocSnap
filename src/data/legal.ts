@@ -96,9 +96,19 @@ export const PRIVACY_POLICY: LegalDocument = {
       paragraphs: ['Geo Snap - NLR currently does not require users to create an account.'],
     },
     {
-      heading: 'No Cloud Storage',
+      heading: 'No Cloud Storage of Our Own',
       paragraphs: [
-        'Geo Snap - NLR does not currently provide its own cloud storage service for user photos or videos. Your captures remain on your device unless you choose to share or export them.',
+        'NLR GROUP OF COMPANIES does not operate any cloud storage service for your photos or videos, and does not receive, store or have access to your captures. Your captures remain on your device unless you choose to share or export them, or enable the optional Google Drive backup described below.',
+      ],
+    },
+    {
+      heading: 'Google Drive Backup (Optional)',
+      paragraphs: [
+        'From version 2.1.0, Geo Snap - NLR can upload copies of your photos to your own Google Drive account. This feature is turned off by default and is enabled separately for each folder you choose. No upload takes place unless you enable it.',
+        'When you enable it for a folder, the application creates a folder in your Google Drive and uploads copies of photos you capture in that folder from that point onward. Photos are always written to your device first, and a failure to reach Google Drive never affects the photo stored on your device. Existing photos, videos and any contents of the Private Vault are not uploaded.',
+        'The application requests the Google "drive.file" permission. This permission grants access only to the folder the application itself created, and does not allow it to see, read or modify any other file in your Google Drive.',
+        'Photos are transmitted directly from your device to Google over an encrypted connection. They are not routed through, received by, or accessible to NLR GROUP OF COMPANIES. Uploaded copies are stored in your own Google Drive, count against your own Google storage quota, and are governed by Google’s privacy policy once they arrive.',
+        'You may turn the feature off for a folder, or remove the Drive connection entirely, at any time from within the application. You may delete uploaded copies from Google Drive yourself, and you may revoke the application’s access to your Google account at any time through your Google Account permissions page.',
       ],
     },
     {

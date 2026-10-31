@@ -4,7 +4,25 @@ export const FORMER_NAME = 'LocSnap';
 export const TAGLINE = 'Capture. Locate. Prove.';
 export const DEVELOPER = 'NLR GROUP OF COMPANIES';
 export const PACKAGE_ID = 'com.nlrgroup.locsnap';
-export const LAST_UPDATED = '10 October 2026';
+export const LAST_UPDATED = '31 October 2026';
+
+/** The release this site describes. Keep in step with versionName in app/build.gradle.kts. */
+export const APP_VERSION = '2.1.0';
+
+/** The highlight of the current release, shown on the home page and the About page. */
+export const WHATS_NEW = {
+  version: APP_VERSION,
+  date: LAST_UPDATED,
+  headline: 'Optional Google Drive backup',
+  body: "Back up a folder's new photos to your own Google Drive. It is off by default and switched on one folder at a time, so nothing is uploaded unless you ask for it.",
+  points: [
+    'Off by default, enabled per folder',
+    'Photos always save on your device first',
+    "The app creates its own GeoSnap folder and can reach nothing else in your Drive",
+    'Uploads wait for a connection and resume on their own',
+    'Turn it off or disconnect at any time',
+  ],
+};
 
 /**
  * Production origin, used for canonical URLs, Open Graph tags and the sitemap.
@@ -81,6 +99,16 @@ export const FEATURES: { title: string; body: string; points?: string[] }[] = [
     body: 'Export a folder or a selection as a ZIP archive or a PDF document, created directly on your device. No server upload required.',
   },
   {
+    title: 'Google Drive Backup',
+    body: "New in 2.1.0, and off by default. Switch it on for a folder and new photos taken there are copied to your own Google Drive, in a folder the app creates for you. Photos are always written to your device first; a Drive problem never costs you a capture.",
+    points: [
+      'Off by default, enabled one folder at a time',
+      'Uploads to a GeoSnap folder in your own Drive',
+      'The app can reach only the folder it created',
+      'Offline uploads wait and resume by themselves',
+    ],
+  },
+  {
     title: 'Themes',
     body: 'Make it yours with a theme setting, including a festival theme, plus a themed (monochrome) adaptive launcher icon alongside the standard one.',
   },
@@ -89,10 +117,11 @@ export const FEATURES: { title: string; body: string; points?: string[] }[] = [
     body: 'Geo Snap - NLR is built to keep your material where you put it.',
     points: [
       'No account, no sign-in',
-      'No cloud photo storage',
+      'No photo storage on our servers — ever',
       'No analytics or ads SDK',
       'No AI processing of your photos',
-      'Only outbound traffic is map tiles and reverse geocoding — a coordinate and nothing else',
+      'Map tiles and address lookup send a coordinate and nothing else',
+      'Drive backup is optional, off by default, and uploads only to your own Google Drive',
     ],
   },
 ];

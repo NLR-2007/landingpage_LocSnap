@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import Navigation from './Navigation';
 import StaggeredFade from './StaggeredFade';
-import { SAMPLE_STAMP } from '../data/locsnap';
+import { SAMPLE_STAMP, WHATS_NEW } from '../data/locsnap';
 
 export default function Hero() {
   return (
@@ -34,10 +34,25 @@ export default function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-green/30 bg-green/10 px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-green sm:text-xs"
+            className="mb-7 flex flex-col items-center gap-3"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-green" />
-            Offline GPS Camera · Android
+            <span className="inline-flex items-center gap-2 rounded-full border border-green/30 bg-green/10 px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-green sm:text-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-green" />
+              Offline GPS Camera · Android
+            </span>
+            {/* The current release, announced until the next one replaces it. */}
+            <Link
+              to="/about#whats-new"
+              className="group inline-flex max-w-[22rem] items-center gap-2 rounded-full border border-line bg-card/80 px-3.5 py-1.5 text-[11px] font-normal text-ink/70 backdrop-blur transition hover:border-green/40 hover:text-ink sm:max-w-none sm:text-xs"
+            >
+              <span className="rounded-full bg-green px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white sm:text-[10px]">
+                New
+              </span>
+              <span className="truncate">{WHATS_NEW.headline} in v{WHATS_NEW.version}</span>
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+                &rarr;
+              </span>
+            </Link>
           </motion.div>
 
           <h1 className="font-display mb-7 font-semibold tracking-tight text-ink text-4xl leading-[1.05] sm:mb-8 sm:text-6xl md:text-7xl lg:text-[5.5rem]">

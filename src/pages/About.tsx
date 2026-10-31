@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
-import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, SAMPLE_STAMP, TAGLINE } from '../data/locsnap';
+import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, SAMPLE_STAMP, TAGLINE, WHATS_NEW } from '../data/locsnap';
 
 const PROBLEMS: { title: string; body: string }[] = [
   {
@@ -48,15 +48,15 @@ const SOLUTIONS: { title: string; body: string }[] = [
     body: 'Turn a visit into a collage, or export the whole folder as a ZIP archive or a PDF document, all created on the device with no upload required.',
   },
   {
-    title: 'No account, no cloud, no AI',
-    body: `${APP_NAME} needs no login and provides no cloud photo storage of its own. Your photos and videos stay on your device and are not analysed by artificial intelligence.`,
+    title: 'No account, no AI, no servers of ours',
+    body: `${APP_NAME} needs no login, and we run no cloud storage of our own — your photos never reach our servers and are never analysed by artificial intelligence. Backup to your own Google Drive is available if you want it, off by default and switched on one folder at a time.`,
   },
 ];
 
 const DIFFERENTIATORS: { title: string; body: string }[] = [
   {
     title: 'No ads, no trackers, no account',
-    body: `Most GPS-camera apps run third-party ad networks and bundle trackers that collect your advertising ID, IP address and location. ${APP_NAME} has none — no ad SDK, no analytics, no cross-app tracking and no sign-in. The only outbound request is a coordinate for map tiles and address lookup.`,
+    body: `Most GPS-camera apps run third-party ad networks and bundle trackers that collect your advertising ID, IP address and location. ${APP_NAME} has none — no ad SDK, no analytics, no cross-app tracking and no sign-in. Outbound traffic is a coordinate for map tiles and address lookup — plus, only if you switch it on, your own photos going to your own Google Drive.`,
   },
   {
     title: 'Free, not paywalled',
@@ -102,6 +102,30 @@ export default function About() {
         {APP_NAME} is an offline-first GPS camera for Android, built by {DEVELOPER}. It exists for
         anyone whose photos need to prove where and when they were taken.
       </p>
+
+      {/* Current release highlight */}
+      <section
+        id="whats-new"
+        className="mt-12 scroll-mt-24 rounded-2xl border border-green/25 bg-green/[0.07] p-7 sm:p-9"
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-green sm:text-xs">
+          New in version {WHATS_NEW.version} · {WHATS_NEW.date}
+        </p>
+        <h2 className="font-display mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          {WHATS_NEW.headline}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm font-normal leading-relaxed text-ink/75 sm:text-base">
+          {WHATS_NEW.body}
+        </p>
+        <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+          {WHATS_NEW.points.map((point) => (
+            <li key={point} className="flex gap-2.5 text-sm font-normal leading-relaxed text-ink/70">
+              <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
+              {point}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* Problem statement */}
       <section className="mt-16">
