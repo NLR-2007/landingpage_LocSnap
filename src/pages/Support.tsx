@@ -27,7 +27,27 @@ const HELP_TOPICS: { question: string; answer: string }[] = [
   },
   {
     question: 'Where are my photos and videos stored?',
-    answer: `Captures stay on your device, saved under Pictures/GeoSnap and Movies/GeoSnap. ${APP_NAME} does not provide its own cloud storage and does not upload your photos or videos to its own servers for core functionality.`,
+    answer: `Captures stay on your device, saved under Pictures/GeoSnap and Movies/GeoSnap. ${APP_NAME} runs no cloud storage of its own and never uploads your photos or videos to its own servers. If you switch on the optional Google Drive backup for a folder, copies of new photos in that folder also go to your own Google Drive account.`,
+  },
+  {
+    question: 'How do I back up a folder to Google Drive?',
+    answer:
+      'Open the folder, tap the Drive icon in the top bar, enter an event name and tap Create Drive folder. Approve the Google prompt, then choose App + Drive. New photos taken in that folder are copied to a GeoSnap folder created in your own Google Drive. Backup is off until you turn it on, and you turn it on one folder at a time. Existing photos, videos and anything in the Private Vault are never uploaded.',
+  },
+  {
+    question: 'How do I stop Drive backup, or delete what was uploaded?',
+    answer:
+      'Open the folder and tap the Drive icon. Switch off "Save in app + upload to Drive" to stop uploading while keeping the connection, or tap Remove Drive connection to disconnect the folder completely. Copies already in your Google Drive stay there until you delete them, which you do in Google Drive itself. To withdraw the app’s access to your Google account entirely, go to myaccount.google.com/permissions, select Geo Snap - NLR and choose Remove access.',
+  },
+  {
+    question: 'What can the app see in my Google Drive?',
+    answer:
+      'Only the folder it created for you. Geo Snap - NLR requests Google’s drive.file permission, which grants access solely to files and folders the application itself creates. It cannot see, open or change any other file in your Google Drive. Photos travel directly from your device to Google over an encrypted connection and are never sent to a server belonging to NLR GROUP OF COMPANIES.',
+  },
+  {
+    question: 'A photo did not upload to Drive',
+    answer:
+      'Uploads need a network connection and wait on the device until one is available, so a photo captured offline uploads later by itself. Open the folder, tap the Drive icon and check the number of photos waiting; tap Retry uploads to prompt it. The photo on your device is never affected by an upload problem. If your Google storage is full, free some space and the queue resumes.',
   },
   {
     question: 'How do I export a folder?',

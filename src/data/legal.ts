@@ -112,6 +112,13 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
+      heading: 'Google User Data Policy',
+      paragraphs: [
+        'Geo Snap - NLR’s use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.',
+        'In practice this means data obtained through the Google Drive permission is used solely to create the backup folder and upload the photographs you choose to back up. It is not transferred to anyone, not used for advertising, not sold, not used to train machine-learning models, and not read by any person at NLR GROUP OF COMPANIES.',
+      ],
+    },
+    {
       heading: 'No AI Analysis',
       paragraphs: [
         'Geo Snap - NLR does not currently use artificial intelligence to analyze your photos or videos.',
@@ -229,7 +236,7 @@ export const TERMS: LegalDocument = {
     {
       heading: 'Local Data Responsibility',
       paragraphs: [
-        'Because Geo Snap - NLR is primarily device-based, you are responsible for maintaining appropriate backups of important photos and exported files.',
+        'Because Geo Snap - NLR is primarily device-based, you are responsible for maintaining appropriate backups of important photos and exported files. The optional Google Drive backup described below is a convenience feature and should not be relied upon as your only backup.',
         'Subject to applicable law, Geo Snap - NLR is not responsible for loss caused by device damage, storage failure, accidental deletion, operating system issues, uninstalling applications or third-party apps.',
       ],
     },
@@ -237,6 +244,15 @@ export const TERMS: LegalDocument = {
       heading: 'Third-Party Services',
       paragraphs: [
         'Certain functionality may depend on Android, device manufacturers, location providers, map providers, app stores and sharing applications. Their own terms and privacy policies may apply.',
+      ],
+    },
+    {
+      heading: 'Google Drive Backup',
+      paragraphs: [
+        'Geo Snap - NLR offers an optional Google Drive backup feature. It is disabled by default and must be enabled by you, separately for each folder. By enabling it you authorise the application to create a folder in your Google Drive account and to upload copies of photographs you subsequently capture in the corresponding folder.',
+        'Uploaded copies are stored in your own Google Drive account, consume your own Google storage quota, and are subject to the Google Terms of Service and Google Privacy Policy. Your use of Google Drive is a matter between you and Google; NLR GROUP OF COMPANIES is not a party to that relationship and does not receive, store or control the uploaded copies.',
+        'Backup is provided on a best-effort basis and is not a guaranteed archival service. Uploads require network connectivity and depend on the availability of Google services, your Google storage quota and your continued authorisation. Subject to applicable law, Geo Snap - NLR is not responsible for photographs that fail to upload, for copies deleted from your Google Drive, or for any loss arising from your reliance on this feature as your only backup.',
+        'You may disable backup for a folder, remove the connection, delete uploaded copies from Google Drive, or revoke the application’s access to your Google account, at any time.',
       ],
     },
     {
