@@ -5,9 +5,6 @@
    the app asks FeeFlo whether someone has Pro, not this project.
 
    FeeFlo checks its own admin allowlist and records who granted what. */
-import { adminConfigured } from '../../server/firebase-admin.mjs';
-import { requireAdmin } from '../../server/admin-auth.mjs';
-
 const FEEFLO_BASE = (process.env.FEEFLO_BASE_URL ?? 'https://feeflo.web.app').replace(/\/+$/, '');
 
 export default async function handler(request, response) {
@@ -20,7 +17,16 @@ export default async function handler(request, response) {
   }
 
   try {
-    if (adminConfigured()) await requireAdmin(request);
+    // Loaded on demand: a failure to import must not take the endpoint down,
+    // and FeeFlo checks the caller and the allowlist itself.
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      try {
+        const { requireAdmin } = await import('../../server/admin-auth.mjs');
+        await requireAdmin(request);
+      } catch (cause) {
+        if (cause?.status) throw cause;
+      }
+    }
 
     const payload = typeof request.body === 'string' ? JSON.parse(request.body) : (request.body ?? {});
     if (!payload.uid) return response.status(400).json({ error: 'A user id is required.' });

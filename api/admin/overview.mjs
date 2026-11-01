@@ -9,19 +9,35 @@
 
    The caller's Geo Snap token is passed through; FeeFlo checks its own admin
    allowlist as well as the one checked here. */
-import { adminAuth, adminConfigured } from '../../server/firebase-admin.mjs';
-import { requireAdmin } from '../../server/admin-auth.mjs';
-
 const FEEFLO_BASE = (process.env.FEEFLO_BASE_URL ?? 'https://feeflo.web.app').replace(/\/+$/, '');
 
+/**
+ * The Firebase Admin SDK is loaded on demand, never at module scope.
+ * Importing it at the top killed the whole function before the handler ran -
+ * one unusable dependency took down an endpoint that does not need it, since
+ * FeeFlo verifies the caller and the allowlist itself.
+ */
+async function firebaseAdmin() {
+  try {
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
+    const [admin, auth] = await Promise.all([
+      import('../../server/firebase-admin.mjs'),
+      import('../../server/admin-auth.mjs')
+    ]);
+    return { ...admin, ...auth };
+  } catch {
+    return null;
+  }
+}
+
 /** Everyone who has ever signed in, which is more than everyone who has paid. */
-async function countSignedInUsers() {
-  if (!adminConfigured()) return null;
+async function countSignedInUsers(admin) {
+  if (!admin?.adminAuth) return null;
   try {
     let count = 0;
     let pageToken;
     do {
-      const page = await adminAuth().listUsers(1000, pageToken);
+      const page = await admin.adminAuth().listUsers(1000, pageToken);
       count += page.users.length;
       pageToken = page.pageToken;
     } while (pageToken);
@@ -43,7 +59,9 @@ export default async function handler(request, response) {
   }
 
   try {
-    if (adminConfigured()) await requireAdmin(request);
+    const admin = await firebaseAdmin();
+    // Checked here when it can be; FeeFlo checks it again regardless.
+    if (admin?.requireAdmin) await admin.requireAdmin(request);
 
     const upstream = await fetch(`${FEEFLO_BASE}/api/v1/geo-snap/admin/overview`, {
       headers: { Authorization: authorization },
@@ -57,7 +75,7 @@ export default async function handler(request, response) {
     }
 
     const data = body?.data ?? body ?? {};
-    const signedIn = await countSignedInUsers();
+    const signedIn = await countSignedInUsers(admin);
     const totals = { ...data.totals };
     if (signedIn !== null) {
       totals.users = signedIn;
