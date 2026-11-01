@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
 import Navigation from './Navigation';
 import StaggeredFade from './StaggeredFade';
-import { SAMPLE_STAMP, WHATS_NEW } from '../data/locsnap';
+import { PLAY_STORE_URL, WHATS_NEW } from '../data/locsnap';
 
 export default function Hero() {
   return (
@@ -86,38 +85,16 @@ export default function Hero() {
             >
               Explore the App
             </Link>
-            <Link
-              to="/download"
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noreferrer"
               className="liquid-glass inline-block rounded-full px-9 py-3.5 text-xs font-medium uppercase tracking-[0.18em] text-ink sm:px-10 sm:py-4 sm:text-sm sm:tracking-[0.2em]"
             >
-              Get it on Android
-            </Link>
+              Get it on Google Play
+            </a>
           </motion.div>
         </div>
-
-        {/* Floating GPS stamp — styled like the dark overlay the app burns into each capture. */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 2.2, ease: 'easeOut' }}
-          className="pointer-events-none absolute bottom-6 left-1/2 z-10 hidden w-[20rem] -translate-x-1/2 sm:bottom-8 sm:left-8 sm:block sm:translate-x-0"
-        >
-          <div className="rounded-2xl border border-black/20 bg-[#0E2238]/95 p-4 shadow-xl backdrop-blur-md">
-            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-light">
-              <MapPin size={12} className="text-brand-light" />
-              {SAMPLE_STAMP.accuracy}
-              <span className="ml-auto text-white/70">{SAMPLE_STAMP.heading}</span>
-            </div>
-            <p className="mt-2 text-sm font-semibold text-white">{SAMPLE_STAMP.place}</p>
-            <p className="mt-0.5 text-[11px] font-light leading-snug text-white/75">
-              {SAMPLE_STAMP.address[0]} {SAMPLE_STAMP.address[1]}
-            </p>
-            <p className="mt-2 text-[11px] font-light text-white/90">
-              {SAMPLE_STAMP.lat} &nbsp; {SAMPLE_STAMP.long}
-            </p>
-            <p className="text-[11px] font-light text-white/65">{SAMPLE_STAMP.date}</p>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

@@ -1,62 +1,60 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
-import { APP_NAME, CONTACT_EMAIL, DEVELOPER } from '../data/locsnap';
-
-/**
- * When the Play Store listing goes live, set PLAY_STORE_URL to the real link.
- * The button below switches from the disabled "Launching Soon" state automatically.
- */
-const PLAY_STORE_URL: string | null = null;
+import { APP_NAME, CONTACT_EMAIL, DEVELOPER, PLAY_STORE_URL } from '../data/locsnap';
 
 export default function Download() {
   return (
-    <PageShell title="Launching Soon" eyebrow={`Get ${APP_NAME}`} wide>
+    <PageShell title="Download" eyebrow={`Get ${APP_NAME}`} wide>
       <Seo
-        title="Download Geo Snap - NLR - Launching Soon on Android"
-        description="Geo Snap - NLR is launching soon on Android. The Google Play listing is not published yet; this page will carry the download link as soon as it goes live."
+        title="Download Geo Snap - NLR for Android on Google Play"
+        description="Download Geo Snap - NLR free from Google Play. An offline-first GPS camera that stamps photos and video with location, address, coordinates, altitude and time."
       />
       <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/80 sm:text-base">
-        {APP_NAME} is being prepared for release on Android. The Play Store listing is not published
-        yet, so there is no download link to give you today. This page will carry the real link as
-        soon as it is live.
+        {APP_NAME} is live on Google Play. Install it on your Android phone and start capturing
+        stamped photos and video straight away — there is no account to create and no sign-in
+        before you take a shot.
       </p>
 
-      <div className="mt-12">
-        {PLAY_STORE_URL ? (
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="liquid-glass inline-block rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-ink/80"
-          >
-            Get it on Google Play
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="liquid-glass cursor-not-allowed rounded-full px-8 py-4 text-xs font-light uppercase tracking-[0.2em] text-ink/55"
-          >
-            Launching Soon
-          </button>
-        )}
+      <div className="mt-12 flex flex-wrap items-center gap-4">
+        <a
+          href={PLAY_STORE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="btn-brand inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] sm:text-sm"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+            <path d="M3.6 1.8a1.5 1.5 0 0 0-.5 1.1v18.2a1.5 1.5 0 0 0 .5 1.1l10.1-10.2L3.6 1.8Zm11.6 8.6 3.1-1.8 2.6 1.5a1.6 1.6 0 0 1 0 2.8l-2.6 1.5-3.1-1.8 0-2.2Zm-1.5.9-2.2 2.2 2.2 2.2 2.6-1.5 0-1.4-2.6-1.5Zm1.5-3.6-2.6-1.5-1.4 1.4 2.2 2.2 1.8-2.1Z" />
+          </svg>
+          Get it on Google Play
+        </a>
+        <a
+          href="/plans"
+          className="liquid-glass inline-flex rounded-full px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-ink sm:text-sm"
+        >
+          See the plans
+        </a>
       </div>
+
+      <p className="mt-5 max-w-3xl text-sm font-normal leading-relaxed text-ink/70">
+        The button opens the Google Play listing for {APP_NAME} in a new tab.
+      </p>
 
       <div className="mt-16 max-w-3xl border-t border-line pt-10">
         <h2 className="text-xs font-light uppercase tracking-[0.2em] text-ink/80">
-          Want to know when it launches?
+          Installing from the Play Store
         </h2>
         <p className="mt-4 text-sm font-normal leading-relaxed text-ink/70">
-          There is no mailing list yet. Email{' '}
+          Tap the button above on your Android phone, or open Google Play, search for{' '}
+          <span className="text-ink/85">{APP_NAME}</span> and install it. If the button does not
+          work on your device, email{' '}
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="break-all text-ink/80 underline underline-offset-4 hover:text-ink"
           >
             {CONTACT_EMAIL}
           </a>{' '}
-          and {DEVELOPER} will let you know when {APP_NAME} is available.
+          and {DEVELOPER} will help you get set up.
         </p>
       </div>
 

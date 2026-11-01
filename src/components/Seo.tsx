@@ -42,8 +42,7 @@ export default function Seo({ title, description, noindex = false }: SeoProps) {
   useEffect(() => {
     const pageTitle = title ?? SITE_TITLE;
     const pageDescription = description ?? SITE_DESCRIPTION;
-    const origin = typeof window !== 'undefined' ? window.location.origin : SITE_URL;
-    const canonical = `${origin}${pathname}`;
+    const canonical = `${SITE_URL}${pathname}`;
 
     document.title = pageTitle;
 

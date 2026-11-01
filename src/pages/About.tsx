@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
-import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, SAMPLE_STAMP, TAGLINE, WHATS_NEW } from '../data/locsnap';
+import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, TAGLINE, WHATS_NEW } from '../data/locsnap';
 
 const PROBLEMS: { title: string; body: string }[] = [
   {
@@ -59,8 +59,8 @@ const DIFFERENTIATORS: { title: string; body: string }[] = [
     body: `Most GPS-camera apps run third-party ad networks and bundle trackers that collect your advertising ID, IP address and location. ${APP_NAME} has none — no ad SDK, no analytics, no cross-app tracking and no sign-in. Outbound traffic is a coordinate for map tiles and address lookup — plus, only if you switch it on, your own photos going to your own Google Drive.`,
   },
   {
-    title: 'Free, not paywalled',
-    body: 'Core capture and features are free. Similar apps typically charge weekly, monthly or lifetime subscriptions just to remove their ads.',
+    title: 'Free to start, no ads',
+    body: 'Capture and organise at no cost, and move to an optional Pro plan only when you need unlimited clicks, collages, folders and Drive connections. Similar apps charge subscriptions just to remove their ads.',
   },
   {
     title: 'An organiser, not just a stamp',
@@ -215,34 +215,6 @@ export default function About() {
           {APP_NAME} combines readable location information with exact GPS coordinates, altitude and
           heading, so your photos and videos are easier to understand and organize.
         </p>
-        <div className="mt-8 max-w-sm rounded-2xl border border-black/10 bg-[#0E2238] p-6 shadow-card">
-          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-light">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-light" />
-            {SAMPLE_STAMP.accuracy}
-            <span className="ml-auto text-white/60">{SAMPLE_STAMP.heading}</span>
-          </div>
-          <p className="mt-3 text-sm font-semibold text-white">{SAMPLE_STAMP.place}</p>
-          <div className="mt-2 space-y-0.5">
-            {SAMPLE_STAMP.address.map((line) => (
-              <p key={line} className="text-xs font-normal leading-relaxed text-white/70">
-                {line}
-              </p>
-            ))}
-          </div>
-          <div className="mt-4 space-y-0.5 text-xs font-light text-white/90">
-            <p>
-              {SAMPLE_STAMP.lat} &nbsp; {SAMPLE_STAMP.long}
-            </p>
-            <p>{SAMPLE_STAMP.altitude}</p>
-          </div>
-          <div className="mt-4 space-y-0.5 text-xs font-light text-white/60">
-            <p>{SAMPLE_STAMP.date}</p>
-            <p>{SAMPLE_STAMP.time}</p>
-          </div>
-          <p className="mt-5 text-[10px] font-light uppercase tracking-[0.2em] text-white/45">
-            Sample stamp
-          </p>
-        </div>
       </section>
 
       {/* Workflow */}

@@ -7,11 +7,12 @@ import {
   DEVELOPER,
   TAGLINE,
 } from '../data/locsnap';
-import { BrandMark } from './Navigation';
+import { BrandMark, useNavLinks } from './Navigation';
 
 const NAV = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
+  { label: 'Plans', to: '/plans' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
   { label: 'Support', to: '/support' },
@@ -19,6 +20,8 @@ const NAV = [
 ];
 
 export default function Footer() {
+  const navLinks = useNavLinks();
+  const accountLink = navLinks[navLinks.length - 1];
   return (
     <footer className="relative border-t border-line bg-[#EFEBDD] px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-5xl">
@@ -59,7 +62,7 @@ export default function Footer() {
           </div>
 
           <nav className="flex flex-col gap-4 sm:items-end">
-            {NAV.map((item) => (
+            {[...NAV, ...(accountLink?.to === '/login' || accountLink?.to === '/my-plans' ? [accountLink] : [])].map((item) => (
               <Link
                 key={item.to}
                 to={item.to}

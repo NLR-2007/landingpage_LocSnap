@@ -9,7 +9,7 @@ export default function Privacy() {
     <PageShell title={PRIVACY_POLICY.title} eyebrow={`Last Updated: ${LAST_UPDATED}`} wide>
       <Seo
         title="Geo Snap - NLR Privacy Policy"
-        description="How the Geo Snap - NLR Android app handles camera, location and storage data. No account, no Geo Snap - NLR cloud photo storage and no AI analysis of your photos."
+        description="How Geo Snap - NLR handles Android captures and optional website Google sign-in. No Geo Snap cloud photo storage or AI analysis of your photos."
       />
       <LegalDoc doc={PRIVACY_POLICY} />
     </PageShell>

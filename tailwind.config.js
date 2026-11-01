@@ -6,9 +6,24 @@ export default {
       colors: {
         // Light "in-app" palette: warm cream page, white cards, green actions.
         cream: '#F7F5EC',
-        card: '#FFFFFF',
+        card: { DEFAULT: '#FFFFFF', foreground: '#1B1E22' },
         ink: '#1B1E22',
         line: '#E7E3D6',
+        /*
+         * shadcn/ui-compatible tokens, mapped onto the palette above so pasted
+         * shadcn components (bg-background, text-muted-foreground, bg-primary…)
+         * render in the site's own colours instead of undefined utilities.
+         */
+        background: '#F7F5EC',
+        foreground: '#1B1E22',
+        primary: { DEFAULT: '#0E7C91', foreground: '#FFFFFF' },
+        secondary: { DEFAULT: '#EFEBDD', foreground: '#1B1E22' },
+        muted: { DEFAULT: '#EFEBDD', foreground: '#6B7078' },
+        accent: { DEFAULT: '#E4F1F3', foreground: '#0A5E6E' },
+        destructive: { DEFAULT: '#B3261E', foreground: '#FFFFFF' },
+        popover: { DEFAULT: '#FFFFFF', foreground: '#1B1E22' },
+        input: '#E7E3D6',
+        ring: '#0E7C91',
         // Primary action colour. The token keeps the name "green" so existing
         // classes need no churn, but the values are the app's teal/navy brand
         // (Geo Snap - NLR moved off green), so the site matches the app.

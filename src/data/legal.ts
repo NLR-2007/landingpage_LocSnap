@@ -92,8 +92,12 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
-      heading: 'No Account',
-      paragraphs: ['Geo Snap - NLR currently does not require users to create an account.'],
+      heading: 'Optional Website Sign-In',
+      paragraphs: [
+        'The Android camera does not require an account. The website offers optional Google sign-in for account access. Google provides a signed identity token, which our website server verifies before accepting your account identity. The website receives your Google account identifier, name, email address and profile picture. Your stable Google account identifier, not your email address, is used to identify the account.',
+        'After sign-in, the website stores a signed session in a secure, HTTP-only cookie for up to one day. Signing out clears this cookie. The website does not request Google Drive access during website sign-in; the Android application’s optional Drive backup has its own separate authorization.',
+        'Pro purchases are paused until the payment service and account database are connected to this sign-in system. The website does not currently store a new user record, login timestamp or Pro membership through this flow.',
+      ],
     },
     {
       heading: 'No Cloud Storage of Our Own',

@@ -4,6 +4,10 @@ export const FORMER_NAME = 'LocSnap';
 export const TAGLINE = 'Capture. Locate. Prove.';
 export const DEVELOPER = 'NLR GROUP OF COMPANIES';
 export const PACKAGE_ID = 'com.nlrgroup.locsnap';
+
+/** Live Google Play listing for the app. */
+export const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.nlrgroup.locsnap&pcampaignid=web_share';
 export const LAST_UPDATED = '31 October 2026';
 
 /** The release this site describes. Keep in step with versionName in app/build.gradle.kts. */
@@ -116,7 +120,7 @@ export const FEATURES: { title: string; body: string; points?: string[] }[] = [
     title: 'Privacy First',
     body: 'Geo Snap - NLR is built to keep your material where you put it.',
     points: [
-      'No account, no sign-in',
+      'Android camera needs no account or sign-in',
       'No photo storage on our servers — ever',
       'No analytics or ads SDK',
       'No AI processing of your photos',
@@ -134,15 +138,3 @@ export const AUDIENCES: { title: string; body: string }[] = [
   { title: 'Travelers', body: 'Remember exactly where photos were captured.' },
   { title: 'Everyday Users', body: 'Use GPS stamps and organized photo folders.' },
 ];
-
-export const SAMPLE_STAMP = {
-  place: 'Hyderabad, Telangana, India 🇮🇳',
-  address: ['Chaitanya College Rd, Kavya Avenue,', 'Ameenpur, Bachupally,', 'Hyderabad, Telangana 500043'],
-  lat: 'Lat 17.547357°',
-  long: 'Long 78.401288°',
-  altitude: 'Altitude 546.5 m',
-  heading: 'N 357°',
-  accuracy: 'GPS ±3.4 m',
-  date: 'Monday, 05/10/2026',
-  time: '05:44 PM GMT +05:30',
-};

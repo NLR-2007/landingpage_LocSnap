@@ -3,29 +3,43 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { APP_NAME, DEVELOPER } from '../data/locsnap';
+import { useAuth } from '../lib/auth-context';
 
 export function BrandMark({ className = 'h-9 w-9' }: { className?: string }) {
+  const { isPro } = useAuth();
   return (
     <img
       src="/logo.png"
-      alt="Geo Snap - NLR logo"
+      alt={isPro ? 'Geo Snap Pro logo' : 'Geo Snap - NLR logo'}
       width={72}
       height={72}
-      className={`${className} shrink-0 rounded-xl`}
+      style={isPro ? { filter: 'hue-rotate(28deg) saturate(1.2)' } : undefined}
+      className={`${className} shrink-0 rounded-xl transition-all duration-300 ${isPro ? 'ring-2 ring-blue-500 shadow-[0_0_20px_rgba(37,99,235,0.55)]' : ''}`}
     />
   );
 }
 
-export const NAV_LINKS = [
+const PUBLIC_NAV_LINKS = [
   { label: 'About', to: '/about' },
+  { label: 'Plans', to: '/plans' },
   { label: 'Privacy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
   { label: 'Support', to: '/support' },
   { label: 'Download', to: '/download' },
 ];
 
+export function useNavLinks() {
+  const { user, loading } = useAuth();
+  return loading ? PUBLIC_NAV_LINKS : [
+    ...PUBLIC_NAV_LINKS,
+    user ? { label: 'My Plans', to: '/my-plans' } : { label: 'Sign in', to: '/login' },
+  ];
+}
+
 export default function Navigation() {
   const [open, setOpen] = useState(false);
+  const { isPro } = useAuth();
+  const navLinks = useNavLinks();
 
   return (
     <>
@@ -35,6 +49,7 @@ export default function Navigation() {
           <span className="leading-tight">
             <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-ink sm:text-base">
               {APP_NAME}
+              {isPro && <span className="ml-2 rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-bold tracking-[0.1em] text-white">PRO</span>}
             </span>
             <span className="mt-0.5 block text-[9px] font-light uppercase tracking-[0.2em] text-ink/55 sm:text-[10px]">
               by {DEVELOPER}
@@ -43,7 +58,7 @@ export default function Navigation() {
         </Link>
 
         <div className="hidden lg:flex items-center gap-6 xl:gap-9">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
@@ -75,7 +90,7 @@ export default function Navigation() {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="mobile-menu-glass fixed left-4 right-4 top-16 z-50 flex flex-col items-center gap-5 rounded-2xl py-8 lg:hidden"
           >
-            {NAV_LINKS.map((link, i) => (
+            {navLinks.map((link, i) => (
               <motion.div
                 key={link.to}
                 initial={{ opacity: 0, y: -8 }}

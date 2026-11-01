@@ -4,7 +4,8 @@ import { Link, NavLink } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { APP_NAME, DEVELOPER } from '../data/locsnap';
 import Footer from './Footer';
-import { BrandMark, NAV_LINKS } from './Navigation';
+import { BrandMark, useNavLinks } from './Navigation';
+import { useAuth } from '../lib/auth-context';
 
 type PageShellProps = {
   title: string;
@@ -12,10 +13,20 @@ type PageShellProps = {
   children: ReactNode;
   /** Content-heavy pages (e.g. About) use the wide column; reading pages stay narrow. */
   wide?: boolean;
+  /** Centres the heading and content column, for single-card pages such as Sign in. */
+  center?: boolean;
 };
 
-export default function PageShell({ title, eyebrow, children, wide = false }: PageShellProps) {
+export default function PageShell({
+  title,
+  eyebrow,
+  children,
+  wide = false,
+  center = false,
+}: PageShellProps) {
   const [open, setOpen] = useState(false);
+  const { isPro } = useAuth();
+  const navLinks = useNavLinks();
 
   return (
     <div className="min-h-screen bg-cream">
@@ -30,6 +41,7 @@ export default function PageShell({ title, eyebrow, children, wide = false }: Pa
             <span className="min-w-0 leading-tight">
               <span className="block truncate text-sm font-semibold uppercase tracking-[0.18em] text-ink">
                 {APP_NAME}
+                {isPro && <span className="ml-2 rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-bold tracking-[0.1em] text-white">PRO</span>}
               </span>
               <span className="mt-0.5 block truncate text-[9px] font-light uppercase tracking-[0.2em] text-ink/55 sm:text-[10px]">
                 by {DEVELOPER}
@@ -39,7 +51,7 @@ export default function PageShell({ title, eyebrow, children, wide = false }: Pa
 
           {/* Full links on large screens. */}
           <nav className="hidden items-center gap-x-6 lg:flex xl:gap-x-8">
-            {NAV_LINKS.map((item) => (
+            {navLinks.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -77,7 +89,7 @@ export default function PageShell({ title, eyebrow, children, wide = false }: Pa
               className="overflow-hidden border-t border-line bg-cream/95 backdrop-blur-md lg:hidden"
             >
               <nav className="mx-auto flex max-w-6xl flex-col px-5 py-2 sm:px-8">
-                {NAV_LINKS.map((item) => (
+                {navLinks.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -98,7 +110,9 @@ export default function PageShell({ title, eyebrow, children, wide = false }: Pa
       </header>
 
       <main className="brand-wash px-5 py-16 sm:px-8 sm:py-24">
-        <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
+        <div
+          className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'} ${center ? 'text-center' : ''}`}
+        >
           {eyebrow && (
             <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-green sm:text-xs">
               {eyebrow}
