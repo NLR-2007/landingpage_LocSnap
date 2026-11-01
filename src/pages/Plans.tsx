@@ -182,12 +182,13 @@ export default function Plans() {
           </ul>
           <div className="mt-auto pt-8">
             <Button
-              disabled
+              onClick={() => void buy('LOCSNAP_PRO_YEARLY')}
+              disabled={busy !== null || !feefloReady}
               className="btn-brand h-12 w-full rounded-full text-[11px] font-semibold uppercase tracking-[0.18em] disabled:opacity-70"
             >
-              Coming soon
+              {busy === 'LOCSNAP_PRO_YEARLY' ? 'Starting checkout…' : user ? 'Get Pro yearly' : 'Sign in to get Pro'}
             </Button>
-            <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">The yearly plan opens once monthly checkout is verified in production.</p>
+            <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.</p>
           </div>
         </article>
       </div>
