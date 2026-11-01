@@ -2,8 +2,11 @@
    token whose verified email is in the ADMIN_EMAILS allowlist. */
 import { adminAuth } from './firebase-admin.mjs';
 
+/** The owner is the default, so the panel works without deployment config. */
+const DEFAULT_ADMINS = 'nlreddy.ceo@gmail.com';
+
 export function adminEmails() {
-  return (process.env.ADMIN_EMAILS || '')
+  return (process.env.ADMIN_EMAILS || DEFAULT_ADMINS)
     .split(',')
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
