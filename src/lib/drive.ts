@@ -128,3 +128,54 @@ export async function photoDataUrl(token: string, fileId: string): Promise<strin
     reader.readAsDataURL(blob);
   });
 }
+
+/**
+ * A small version of a photograph, for the picking grid.
+ *
+ * Drive's own thumbnailLink needs the browser's Google session rather than a
+ * bearer token, so it cannot be used for files only this app can see. The
+ * bytes are fetched once and scaled down here instead; the full-size blob is
+ * released immediately, because a folder of two hundred photographs held at
+ * full resolution would exhaust the tab.
+ */
+export async function photoThumbnail(
+  token: string,
+  fileId: string,
+  maxPx = 320
+): Promise<string> {
+  const blob = await downloadPhoto(token, fileId);
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const scale = Math.min(1, maxPx / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('no canvas');
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    return canvas.toDataURL('image/jpeg', 0.7);
+  } catch {
+    // Any failure to scale is not worth losing the picture over.
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error('Could not read a photograph.'));
+      reader.readAsDataURL(blob);
+    });
+  }
+}
+
+/** Runs the jobs a few at a time, so a big folder does not open 200 requests at once. */
+export async function inBatches<T, R>(
+  items: T[],
+  size: number,
+  work: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = [];
+  for (let index = 0; index < items.length; index += size) {
+    const slice = items.slice(index, index + size);
+    results.push(...await Promise.all(slice.map(work)));
+  }
+  return results;
+}

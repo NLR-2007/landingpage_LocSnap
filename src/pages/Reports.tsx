@@ -10,11 +10,11 @@ import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
 import { useAuth } from '../lib/auth-context';
 import {
-  connectDrive, listEventFolders, listPhotos, photoDataUrl,
+  connectDrive, inBatches, listEventFolders, listPhotos, photoDataUrl, photoThumbnail,
   type DriveFolder, type DrivePhoto,
 } from '../lib/drive';
 import {
-  DEFAULT_TEMPLATE, EMPTY_EVENT, EVENT_TYPES,
+  DEFAULT_TEMPLATE, EMPTY_EVENT, EVENT_TYPES, formatDateTime,
   type EventFields, type Report, type ReportPhoto, type ReportTemplate, fileStem,
 } from '../lib/report';
 import { buildPdf } from '../lib/report-pdf';
@@ -32,6 +32,10 @@ export default function Reports() {
   const [folder, setFolder] = useState<DriveFolder | null>(null);
   const [photos, setPhotos] = useState<DrivePhoto[]>([]);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
+  /** Small versions for the picking grid, keyed by file id, filled in as they arrive. */
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  /** The photograph being looked at full size; dataUrl null while it loads. */
+  const [preview, setPreview] = useState<{ photo: DrivePhoto; dataUrl: string | null } | null>(null);
   const [fields, setFields] = useState<EventFields>(EMPTY_EVENT);
   const [template, setTemplate] = useState<ReportTemplate>(DEFAULT_TEMPLATE);
   const [busy, setBusy] = useState<string | null>(null);
@@ -80,6 +84,10 @@ export default function Reports() {
       setFolder(target);
       setPhotos(found);
       setChosen(new Set(found.map((p) => p.id)));
+      setThumbs({});
+      // The grid is usable before the pictures land, so the thumbnails are
+      // fetched in the background, a few at a time, and appear as they come.
+      void loadThumbs(token, found);
       setFields((current) => ({
         ...current,
         title: current.title || target.name.replace(/_/g, ' '),
@@ -89,6 +97,29 @@ export default function Reports() {
       setError((cause as Error).message);
     } finally {
       setBusy(null);
+    }
+  }
+
+  async function loadThumbs(granted: string, list: DrivePhoto[]) {
+    await inBatches(list, 4, async (photo) => {
+      try {
+        const small = await photoThumbnail(granted, photo.id);
+        setThumbs((current) => ({ ...current, [photo.id]: small }));
+      } catch {
+        // A photograph that will not load simply keeps its placeholder tile.
+      }
+    });
+  }
+
+  /** Full size, fetched on demand - a preview should not cost a whole folder. */
+  async function openPreview(photo: DrivePhoto) {
+    setPreview({ photo, dataUrl: thumbs[photo.id] ?? null });
+    if (!token) return;
+    try {
+      const full = await photoDataUrl(token, photo.id);
+      setPreview((current) => (current?.photo.id === photo.id ? { photo, dataUrl: full } : current));
+    } catch (cause) {
+      setError((cause as Error).message);
     }
   }
 
@@ -276,17 +307,36 @@ export default function Reports() {
             </div>
 
             <h3 className="font-display mt-8 text-lg font-medium text-ink">Photographs</h3>
-            <div className="mt-3 grid max-h-72 grid-cols-3 gap-2 overflow-y-auto rounded-2xl border border-line p-3">
-              {photos.map((photo) => (
-                <button key={photo.id} type="button"
-                  onClick={() => setChosen((current) => {
-                    const next = new Set(current);
-                    if (next.has(photo.id)) next.delete(photo.id); else next.add(photo.id);
-                    return next;
-                  })}
-                  className={`rounded-lg border p-2 text-left text-[10px] leading-tight ${chosen.has(photo.id) ? 'border-green bg-green/10 text-ink' : 'border-line text-ink/50'}`}>
-                  {chosen.has(photo.id) ? '✓ ' : ''}{photo.name.slice(0, 26)}
-                </button>
+            <p className="mt-1 text-xs text-ink/50">
+              Tap a photograph to see it full size. The tick in the corner decides whether it goes
+              into the report.
+            </p>
+            <div className="mt-3 grid max-h-[26rem] grid-cols-2 gap-3 overflow-y-auto rounded-2xl border border-line p-3 sm:grid-cols-3 md:grid-cols-4">
+              {photos.map((photo, index) => (
+                <figure key={photo.id}
+                  className={`relative overflow-hidden rounded-xl border ${chosen.has(photo.id) ? 'border-green' : 'border-line'}`}>
+                  <button type="button" onClick={() => void openPreview(photo)}
+                    className="block w-full" title="Open preview">
+                    {thumbs[photo.id]
+                      ? <img src={thumbs[photo.id]} alt={photo.name} loading="lazy"
+                          className="aspect-[4/3] w-full object-cover" />
+                      : <span className="flex aspect-[4/3] w-full items-center justify-center bg-ink/5 text-[10px] text-ink/40">
+                          loading…
+                        </span>}
+                  </button>
+                  <button type="button" aria-label={chosen.has(photo.id) ? 'Remove from report' : 'Include in report'}
+                    onClick={() => setChosen((current) => {
+                      const next = new Set(current);
+                      if (next.has(photo.id)) next.delete(photo.id); else next.add(photo.id);
+                      return next;
+                    })}
+                    className={`absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full text-xs font-bold shadow ${chosen.has(photo.id) ? 'bg-green text-white' : 'bg-white/90 text-ink/40'}`}>
+                    {chosen.has(photo.id) ? '✓' : '+'}
+                  </button>
+                  <figcaption className="px-2 py-1 text-[10px] leading-tight text-ink/55">
+                    {index + 1}. {photo.takenAt ? formatDateTime(photo.takenAt) : photo.name.slice(0, 22)}
+                  </figcaption>
+                </figure>
               ))}
             </div>
 
@@ -306,6 +356,47 @@ export default function Reports() {
             </p>
             <button type="button" onClick={() => { setStage('folders'); setFolder(null); }}
               className="mt-5 text-xs font-medium text-ink/55">← Choose a different event</button>
+          </div>
+        </div>
+      )}
+
+      {preview && (
+        <div role="dialog" aria-modal="true"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink/80 p-4"
+          onClick={() => setPreview(null)}>
+          <div className="max-h-full w-full max-w-3xl overflow-hidden rounded-2xl bg-card"
+            onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-ink">{preview.photo.name}</p>
+                {preview.photo.takenAt && (
+                  <p className="text-xs text-ink/55">{formatDateTime(preview.photo.takenAt)}</p>
+                )}
+              </div>
+              <button type="button" onClick={() => setPreview(null)}
+                className="shrink-0 text-xs font-medium text-ink/55">Close</button>
+            </div>
+            {preview.dataUrl ? (
+              <img src={preview.dataUrl} alt={preview.photo.name}
+                className="max-h-[70vh] w-full bg-ink/5 object-contain" />
+            ) : (
+              <div className="grid h-72 place-items-center text-sm text-ink/50">Loading photograph…</div>
+            )}
+            <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3">
+              <span className="text-xs text-ink/55">
+                {chosen.has(preview.photo.id) ? 'In the report' : 'Not in the report'}
+              </span>
+              <button type="button"
+                onClick={() => setChosen((current) => {
+                  const next = new Set(current);
+                  if (next.has(preview.photo.id)) next.delete(preview.photo.id);
+                  else next.add(preview.photo.id);
+                  return next;
+                })}
+                className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] ${chosen.has(preview.photo.id) ? 'border border-line text-ink/70' : 'btn-brand'}`}>
+                {chosen.has(preview.photo.id) ? 'Remove' : 'Include'}
+              </button>
+            </div>
           </div>
         </div>
       )}
