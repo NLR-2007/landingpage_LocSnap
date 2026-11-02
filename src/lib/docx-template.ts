@@ -164,6 +164,34 @@ export function markerPlan(doc: TemplateDoc): Record<number, Slot[]> {
   return plan;
 }
 
+/**
+ * The fields a filled template will actually read.
+ *
+ * A college that uploads its own proforma should be asked for what that
+ * proforma asks for and nothing else - its letterhead already carries the
+ * institution's name, so a box demanding it again is work for no output.
+ * Derived from the plan, so it is what the document will genuinely use rather
+ * than a guess at what it might.
+ */
+export function fieldsUsedBy(plan: Record<number, Slot[]>): Set<keyof EventFields> {
+  const used = new Set<keyof EventFields>();
+  Object.values(plan).flat().forEach((slot) => {
+    if (slot.kind === 'field') used.add(slot.field);
+    // The date range is written from the two dates, so both are still needed.
+    if (slot.kind === 'dateRange') { used.add('startDate'); used.add('endDate'); }
+    // Particulars prints most of the form, so asking for all of it is right.
+    if (slot.kind === 'particulars') {
+      ([
+        'eventType', 'title', 'subtitle', 'department', 'academicYear', 'startDate', 'endDate',
+        'venue', 'mode', 'collaboratingAgency', 'sponsor', 'budget', 'coordinator',
+        'coordinatorDesignation', 'coCoordinator', 'resourcePerson', 'resourceAffiliation',
+        'resourceTopic', 'chiefGuest', 'studentsCount', 'facultyCount', 'externalCount',
+      ] as (keyof EventFields)[]).forEach((field) => used.add(field));
+    }
+  });
+  return used;
+}
+
 /** What a slot resolves to as a line of text. Blocks return ''. */
 function textFor(slot: Slot, report: Report): string {
   switch (slot.kind) {

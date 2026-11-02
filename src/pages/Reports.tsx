@@ -22,7 +22,7 @@ import { buildPdf } from '../lib/report-pdf';
 import { buildDocx } from '../lib/report-docx';
 import TemplatePanel from '../components/TemplatePanel';
 import {
-  fillTemplate, markerPlan, readTemplate, type Slot, type TemplateDoc,
+  fieldsUsedBy, fillTemplate, markerPlan, readTemplate, type Slot, type TemplateDoc,
 } from '../lib/docx-template';
 
 const DRAFT_KEY = 'geosnap-report-draft';
@@ -183,6 +183,32 @@ export default function Reports() {
   const selected = useMemo(
     () => photos.filter((photo) => chosen.has(photo.id)),
     [photos, chosen]
+  );
+
+  /**
+   * Which boxes this report can actually use.
+   *
+   * null means all of them: our own layout prints every field it is given, and
+   * so does a template route with nothing uploaded yet. Once a template is in
+   * hand we know exactly what it reads, and asking for more than that is work
+   * with no output - a letterhead already carries the institution's name.
+   */
+  const needed = useMemo<Set<keyof EventFields> | null>(() => {
+    if (route !== 'own' || !custom) return null;
+    const plan = custom.markers.length ? markerPlan(custom) : mapping;
+    if (!Object.keys(plan).length) return null;
+    return fieldsUsedBy(plan);
+  }, [route, custom, mapping]);
+
+  const [showAllFields, setShowAllFields] = useState(false);
+  const want = useCallback(
+    (key: keyof EventFields) => !needed || showAllFields || needed.has(key),
+    [needed, showAllFields]
+  );
+  /** A heading with nothing under it is worse than no heading. */
+  const wantGroup = useCallback(
+    (keys: (keyof EventFields)[]) => keys.some((key) => want(key)),
+    [want]
   );
 
   async function loadTemplate(file: File) {
@@ -360,56 +386,77 @@ export default function Reports() {
                 className="ml-2 font-medium text-green">change</button>
             </p>
 
-            <Section title="Institution" />
-            <Field label="College / institution name" value={fields.institutionName} onChange={(v) => set('institutionName', v)} />
-            <Field label="Affiliated university" value={fields.institutionUniversity} onChange={(v) => set('institutionUniversity', v)} />
-            <Field label="Institution address" value={fields.institutionAddress} onChange={(v) => set('institutionAddress', v)} rows={2} />
-            <Field label="Organising department" value={fields.department} onChange={(v) => set('department', v)} />
+            {needed && (
+              <p className="mt-4 rounded-2xl border border-line bg-card px-4 py-3 text-xs leading-relaxed text-ink/65">
+                {custom?.name} reads <span className="font-medium text-ink">{needed.size}</span> of
+                the 31 details, so only those are asked for. Anything else you type would not appear
+                in it.{' '}
+                <button type="button" onClick={() => setShowAllFields((shown) => !shown)}
+                  className="font-medium text-green">
+                  {showAllFields ? 'Hide the rest' : 'Show the rest anyway'}
+                </button>
+              </p>
+            )}
 
-            <Section title="Event" />
-            <label className="mt-4 block text-[10px] font-medium uppercase tracking-[0.16em] text-ink/55">Type of activity</label>
-            <select value={fields.eventType} onChange={(e) => set('eventType', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-line bg-cream/40 px-3 py-2 text-sm text-ink outline-none focus:border-green/50">
-              {EVENT_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-            </select>
-            <Field label="Title of the activity" value={fields.title} onChange={(v) => set('title', v)} />
-            <Field label="Theme / sub-title" value={fields.subtitle} onChange={(v) => set('subtitle', v)} />
-            <Field label="Academic year" value={fields.academicYear} onChange={(v) => set('academicYear', v)} placeholder="2026-27" />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Start date" type="date" value={fields.startDate} onChange={(v) => set('startDate', v)} />
-              <Field label="End date" type="date" value={fields.endDate} onChange={(v) => set('endDate', v)} />
-            </div>
-            <Field label="Venue" value={fields.venue} onChange={(v) => set('venue', v)} rows={2} />
-            <Field label="Collaborating agency" value={fields.collaboratingAgency} onChange={(v) => set('collaboratingAgency', v)} />
-            <Field label="Sponsor" value={fields.sponsor} onChange={(v) => set('sponsor', v)} />
-            <Field label="Budget / expenditure" value={fields.budget} onChange={(v) => set('budget', v)} />
+            {wantGroup(['institutionName', 'institutionUniversity', 'institutionAddress', 'department'])
+              && <Section title="Institution" />}
+            {want('institutionName') && <Field label="College / institution name" value={fields.institutionName} onChange={(v) => set('institutionName', v)} />}
+            {want('institutionUniversity') && <Field label="Affiliated university" value={fields.institutionUniversity} onChange={(v) => set('institutionUniversity', v)} />}
+            {want('institutionAddress') && <Field label="Institution address" value={fields.institutionAddress} onChange={(v) => set('institutionAddress', v)} rows={2} />}
+            {want('department') && <Field label="Organising department" value={fields.department} onChange={(v) => set('department', v)} />}
 
-            <Section title="People" />
+            {wantGroup(['eventType', 'title', 'subtitle', 'academicYear', 'startDate', 'endDate',
+              'venue', 'collaboratingAgency', 'sponsor', 'budget']) && <Section title="Event" />}
+            {want('eventType') && (
+              <>
+                <label className="mt-4 block text-[10px] font-medium uppercase tracking-[0.16em] text-ink/55">Type of activity</label>
+                <select value={fields.eventType} onChange={(e) => set('eventType', e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-line bg-cream/40 px-3 py-2 text-sm text-ink outline-none focus:border-green/50">
+                  {EVENT_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+                </select>
+              </>
+            )}
+            {want('title') && <Field label="Title of the activity" value={fields.title} onChange={(v) => set('title', v)} />}
+            {want('subtitle') && <Field label="Theme / sub-title" value={fields.subtitle} onChange={(v) => set('subtitle', v)} />}
+            {want('academicYear') && <Field label="Academic year" value={fields.academicYear} onChange={(v) => set('academicYear', v)} placeholder="2026-27" />}
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Coordinator" value={fields.coordinator} onChange={(v) => set('coordinator', v)} />
-              <Field label="Designation" value={fields.coordinatorDesignation} onChange={(v) => set('coordinatorDesignation', v)} />
+              {want('startDate') && <Field label="Start date" type="date" value={fields.startDate} onChange={(v) => set('startDate', v)} />}
+              {want('endDate') && <Field label="End date" type="date" value={fields.endDate} onChange={(v) => set('endDate', v)} />}
             </div>
-            <Field label="Co-coordinator" value={fields.coCoordinator} onChange={(v) => set('coCoordinator', v)} />
+            {want('venue') && <Field label="Venue" value={fields.venue} onChange={(v) => set('venue', v)} rows={2} />}
+            {want('collaboratingAgency') && <Field label="Collaborating agency" value={fields.collaboratingAgency} onChange={(v) => set('collaboratingAgency', v)} />}
+            {want('sponsor') && <Field label="Sponsor" value={fields.sponsor} onChange={(v) => set('sponsor', v)} />}
+            {want('budget') && <Field label="Budget / expenditure" value={fields.budget} onChange={(v) => set('budget', v)} />}
+
+            {wantGroup(['coordinator', 'coordinatorDesignation', 'coCoordinator', 'resourcePerson',
+              'resourceAffiliation', 'resourceTopic', 'chiefGuest', 'studentsCount', 'facultyCount',
+              'externalCount']) && <Section title="People" />}
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Resource person" value={fields.resourcePerson} onChange={(v) => set('resourcePerson', v)} />
-              <Field label="Affiliation" value={fields.resourceAffiliation} onChange={(v) => set('resourceAffiliation', v)} />
+              {want('coordinator') && <Field label="Coordinator" value={fields.coordinator} onChange={(v) => set('coordinator', v)} />}
+              {want('coordinatorDesignation') && <Field label="Designation" value={fields.coordinatorDesignation} onChange={(v) => set('coordinatorDesignation', v)} />}
             </div>
-            <Field label="Topic covered" value={fields.resourceTopic} onChange={(v) => set('resourceTopic', v)} rows={2} />
-            <Field label="Chief guest" value={fields.chiefGuest} onChange={(v) => set('chiefGuest', v)} />
+            {want('coCoordinator') && <Field label="Co-coordinator" value={fields.coCoordinator} onChange={(v) => set('coCoordinator', v)} />}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {want('resourcePerson') && <Field label="Resource person" value={fields.resourcePerson} onChange={(v) => set('resourcePerson', v)} />}
+              {want('resourceAffiliation') && <Field label="Affiliation" value={fields.resourceAffiliation} onChange={(v) => set('resourceAffiliation', v)} />}
+            </div>
+            {want('resourceTopic') && <Field label="Topic covered" value={fields.resourceTopic} onChange={(v) => set('resourceTopic', v)} rows={2} />}
+            {want('chiefGuest') && <Field label="Chief guest" value={fields.chiefGuest} onChange={(v) => set('chiefGuest', v)} />}
             <div className="grid gap-3 sm:grid-cols-3">
-              <Field label="Students" value={fields.studentsCount} onChange={(v) => set('studentsCount', v)} />
-              <Field label="Faculty" value={fields.facultyCount} onChange={(v) => set('facultyCount', v)} />
-              <Field label="External" value={fields.externalCount} onChange={(v) => set('externalCount', v)} />
+              {want('studentsCount') && <Field label="Students" value={fields.studentsCount} onChange={(v) => set('studentsCount', v)} />}
+              {want('facultyCount') && <Field label="Faculty" value={fields.facultyCount} onChange={(v) => set('facultyCount', v)} />}
+              {want('externalCount') && <Field label="External" value={fields.externalCount} onChange={(v) => set('externalCount', v)} />}
             </div>
 
-            <Section title="Report write-up" />
-            <Field label="Objectives" value={fields.objectives} onChange={(v) => set('objectives', v)} rows={4} />
-            <Field label="Description of the activity" value={fields.description} onChange={(v) => set('description', v)} rows={7} />
-            <Field label="Outcome" value={fields.outcome} onChange={(v) => set('outcome', v)} rows={4} />
-            <Field label="Impact and benefit" value={fields.impact} onChange={(v) => set('impact', v)} rows={4} />
-            <Field label="Beneficiaries" value={fields.beneficiaries} onChange={(v) => set('beneficiaries', v)} rows={2} />
-            <Field label="Feedback" value={fields.feedback} onChange={(v) => set('feedback', v)} rows={3} />
-            <Field label="Remarks" value={fields.remarks} onChange={(v) => set('remarks', v)} rows={3} />
+            {wantGroup(['objectives', 'description', 'outcome', 'impact', 'beneficiaries',
+              'feedback', 'remarks']) && <Section title="Report write-up" />}
+            {want('objectives') && <Field label="Objectives" value={fields.objectives} onChange={(v) => set('objectives', v)} rows={4} />}
+            {want('description') && <Field label="Description of the activity" value={fields.description} onChange={(v) => set('description', v)} rows={7} />}
+            {want('outcome') && <Field label="Outcome" value={fields.outcome} onChange={(v) => set('outcome', v)} rows={4} />}
+            {want('impact') && <Field label="Impact and benefit" value={fields.impact} onChange={(v) => set('impact', v)} rows={4} />}
+            {want('beneficiaries') && <Field label="Beneficiaries" value={fields.beneficiaries} onChange={(v) => set('beneficiaries', v)} rows={2} />}
+            {want('feedback') && <Field label="Feedback" value={fields.feedback} onChange={(v) => set('feedback', v)} rows={3} />}
+            {want('remarks') && <Field label="Remarks" value={fields.remarks} onChange={(v) => set('remarks', v)} rows={3} />}
 
             {/* Added sections are our layout's; a college's own template says
                 where its content goes, so they would have nowhere to print. */}
