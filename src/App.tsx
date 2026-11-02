@@ -12,6 +12,7 @@ import NotFound from './pages/NotFound';
 import Account from './pages/Account';
 import PaymentSuccess from './pages/PaymentSuccess';
 import Admin from './pages/Admin';
+import DriveTest from './pages/DriveTest';
 import { AuthProvider } from './lib/auth-context';
 
 function ScrollToTop() {
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/my-plans" element={<Account />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/drive-test" element={<DriveTest />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </BrowserRouter>
