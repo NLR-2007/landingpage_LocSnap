@@ -19,7 +19,44 @@ const LINE = 15;
 
 type Cursor = { y: number; headerH: number; footerH: number };
 
-export async function buildPdf(report: Report): Promise<Blob> {
+/**
+ * jsPDF's built-in Times is WinAnsi-encoded, so a character outside Latin-1
+ * comes out as mojibake - a budget of ₹5,000 printed as "¹5,000". Embedding a
+ * Unicode font would cost several hundred kilobytes on every page load, so the
+ * handful of symbols an Indian college report actually uses are spelled out
+ * instead. Word has no such limit; it uses the reader's own fonts.
+ */
+const SUBSTITUTIONS: [RegExp, string][] = [
+  [/₹/g, 'Rs. '],          // rupee
+  [/[‘’]/g, "'"],     // curly quotes, from pasted Word text
+  [/[“”]/g, '"'],
+  [/•/g, '- '],            // bullet
+  [/€/g, 'EUR '],
+  [/\u00A0/g, ' '],       // non-breaking space, which splitTextToSize will not wrap on
+];
+
+function latin(text: string): string {
+  let out = SUBSTITUTIONS.reduce((value, [from, to]) => value.replace(from, to), text);
+  // En dash, em dash and ellipsis are in WinAnsi; anything beyond it is not.
+  out = out.replace(/[^\u0000-\u00FF\u2013\u2014\u2026]/g, '');
+  return out;
+}
+
+/** Every string the renderer will draw, made printable, in one place. */
+function printable(report: Report): Report {
+  const fields = Object.fromEntries(
+    Object.entries(report.fields).map(([key, value]) => [key, latin(String(value))])
+  ) as Report['fields'];
+  return {
+    ...report,
+    fields,
+    folderName: latin(report.folderName),
+    photos: report.photos.map((photo) => ({ ...photo, name: latin(photo.name) })),
+  };
+}
+
+export async function buildPdf(source: Report): Promise<Blob> {
+  const report = printable(source);
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   doc.setFont('times', 'normal');
 

@@ -188,7 +188,7 @@ export function particulars(report: Report): { label: string; value: string }[] 
     { label: 'Chief guest', value: f.chiefGuest },
     { label: 'Participants', value: participants },
     { label: 'Photographs attached', value: report.photos.length ? String(report.photos.length) : '' },
-  ].filter((row) => !blank(row.value));
+  ].map((row) => ({ ...row, value: row.value.trim() })).filter((row) => !blank(row.value));
 }
 
 /** "Name, designation", dropping whichever half was left unanswered. */
