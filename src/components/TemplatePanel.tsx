@@ -14,6 +14,17 @@ import { useRef } from 'react';
 import {
   MARKERS, slotFor, type Slot, type TemplateDoc,
 } from '../lib/docx-template';
+import { STARTER_NAME, buildStarterTemplate } from '../lib/report-starter';
+
+async function downloadStarter() {
+  const blob = await buildStarterTemplate();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = STARTER_NAME;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 type Props = {
   doc: TemplateDoc | null;
@@ -27,6 +38,15 @@ type Props = {
 export default function TemplatePanel({ doc, mapping, busy, onUpload, onClear, onMapping }: Props) {
   const input = useRef<HTMLInputElement>(null);
 
+  const chooser = (
+    <input ref={input} type="file" accept=".docx" className="hidden"
+      onChange={(event) => {
+        const file = event.target.files?.[0];
+        if (file) onUpload(file);
+        event.target.value = '';
+      }} />
+  );
+
   if (!doc) {
     return (
       <div className="mt-3 rounded-2xl border border-dashed border-line p-5">
@@ -34,16 +54,30 @@ export default function TemplatePanel({ doc, mapping, busy, onUpload, onClear, o
           Upload the Word file your institution already files - letterhead, margins, fonts and all.
           The report is written into that document; nothing else in it is changed.
         </p>
-        <button type="button" disabled={busy} onClick={() => input.current?.click()}
-          className="btn-brand mt-4 rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
-          Choose a .docx
-        </button>
-        <input ref={input} type="file" accept=".docx" className="hidden"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) onUpload(file);
-            event.target.value = '';
-          }} />
+
+        <ol className="mt-4 space-y-2 text-xs leading-relaxed text-ink/65">
+          <li>
+            <span className="font-medium text-ink">Already have a proforma?</span> Upload it as it
+            is. If it has no markers we will show you its lines and ask what each one is - you will
+            not have to edit the document at all.
+          </li>
+          <li>
+            <span className="font-medium text-ink">Starting from nothing?</span> Download the
+            starter below, put your letterhead on it in Word, save, and upload it back.
+          </li>
+        </ol>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" disabled={busy} onClick={() => input.current?.click()}
+            className="btn-brand rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
+            Choose a .docx
+          </button>
+          <button type="button" disabled={busy} onClick={() => void downloadStarter()}
+            className="rounded-full border border-line px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ink/80 disabled:opacity-50">
+            Download a starter
+          </button>
+        </div>
+        {chooser}
         <MarkerReference />
       </div>
     );

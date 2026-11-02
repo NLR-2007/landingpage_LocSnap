@@ -218,6 +218,35 @@ test('a section the user added prints after the standard ones', () => {
   assert.deepEqual(headings, ['Objectives', 'Criterion 3.4.2', 'Additional notes']);
 });
 
+test('the starter template we hand out actually fills', async () => {
+  // The closed loop: what the download button produces must be something the
+  // upload path understands, or we are sending colleges a file that does not
+  // work. Markers in table cells are the part most likely to break.
+  const { buildStarterTemplate } = await import('./report-starter');
+  const blob = await buildStarterTemplate();
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+
+  const doc = await readTemplate({
+    name: 'starter.docx',
+    arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+  } as unknown as File);
+
+  for (const expected of ['title', 'venue', 'dateRange', 'photos', 'annexure', 'photoCount']) {
+    assert.ok(doc.markers.includes(expected), `starter is missing {{${expected}}}`);
+  }
+  assert.deepEqual(doc.unknownMarkers, [], 'the starter must not use markers we cannot fill');
+
+  const filled = await fillTemplate(doc, report(), markerPlan(doc));
+  const files = unzipSync(new Uint8Array(await filled.arrayBuffer()));
+  const xml = strFromU8(files['word/document.xml']);
+
+  assert.doesNotMatch(xml, /\{\{/, 'a marker survived the round trip');
+  assert.match(xml, /DBMS Hackathon/);
+  assert.match(xml, /Seminar Hall, Block A/, 'a marker inside a table cell was not filled');
+  assert.ok(files['word/media/geosnap1.jpeg'], 'photographs did not reach the starter');
+  assert.match(xml, /r:embed="rIdGeoSnap1"/);
+});
+
 test('a file that is not a .docx is refused in words a person can act on', async () => {
   await assert.rejects(
     () => readTemplate({
