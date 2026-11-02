@@ -19,10 +19,16 @@ import {
 } from '../lib/report';
 import { buildPdf } from '../lib/report-pdf';
 import { buildDocx } from '../lib/report-docx';
+import TemplatePanel from '../components/TemplatePanel';
+import {
+  fillTemplate, markerPlan, readTemplate, type Slot, type TemplateDoc,
+} from '../lib/docx-template';
 
 const DRAFT_KEY = 'geosnap-report-draft';
 
 type Stage = 'connect' | 'folders' | 'edit';
+/** Our PDF, our Word layout, or the college's own document. */
+type Kind = 'pdf' | 'docx' | 'template';
 
 export default function Reports() {
   const { user, loading } = useAuth();
@@ -36,6 +42,10 @@ export default function Reports() {
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   /** The photograph being looked at full size; dataUrl null while it loads. */
   const [preview, setPreview] = useState<{ photo: DrivePhoto; dataUrl: string | null } | null>(null);
+  /** The college's own .docx, held in this tab only - it is far too big for localStorage. */
+  const [custom, setCustom] = useState<TemplateDoc | null>(null);
+  /** Plan B: which paragraph of that template holds what. */
+  const [mapping, setMapping] = useState<Record<number, Slot[]>>({});
   const [fields, setFields] = useState<EventFields>(EMPTY_EVENT);
   const [template, setTemplate] = useState<ReportTemplate>(DEFAULT_TEMPLATE);
   const [busy, setBusy] = useState<string | null>(null);
@@ -128,9 +138,29 @@ export default function Reports() {
     [photos, chosen]
   );
 
-  async function generate(kind: 'pdf' | 'docx') {
+  async function loadTemplate(file: File) {
+    setBusy('Reading the template…');
+    setError(null);
+    try {
+      const doc = await readTemplate(file);
+      setCustom(doc);
+      setMapping({});
+      if (!doc.markers.length) {
+        setError(null);
+      }
+    } catch (cause) {
+      setError((cause as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const label = (kind: Kind) => (kind === 'pdf' ? 'PDF' : 'Word file');
+
+  async function generate(kind: Kind) {
     if (!token || !folder) return;
-    setBusy(`Building the ${kind === 'pdf' ? 'PDF' : 'Word file'}…`);
+    if (kind === 'template' && !custom) return;
+    setBusy(`Building the ${label(kind)}…`);
     setError(null);
     try {
       // Only the chosen photographs are fetched - a 200-photo folder should not
@@ -144,7 +174,18 @@ export default function Reports() {
         });
       }
       const report: Report = { fields, template, photos: withImages, folderName: folder.name };
-      setBusy(`Building the ${kind === 'pdf' ? 'PDF' : 'Word file'}…`);
+      setBusy(`Building the ${label(kind)}…`);
+
+      if (kind === 'template' && custom) {
+        // Plan A when the template named its own slots, Plan B when the user did.
+        const plan = custom.markers.length ? markerPlan(custom) : mapping;
+        if (!Object.keys(plan).length) {
+          throw new Error('Nothing is mapped yet. Say what at least one line of the template is.');
+        }
+        download(await fillTemplate(custom, report, plan), `${fileStem(report)}.docx`);
+        return;
+      }
+
       const blob = kind === 'pdf' ? await buildPdf(report) : await buildDocx(report);
       download(blob, `${fileStem(report)}.${kind}`);
     } catch (cause) {
@@ -269,7 +310,13 @@ export default function Reports() {
           </div>
 
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <h3 className="font-display text-lg font-medium text-ink">Your college template</h3>
+            <h3 className="font-display text-lg font-medium text-ink">Your own Word document</h3>
+            <TemplatePanel doc={custom} mapping={mapping} busy={Boolean(busy)}
+              onUpload={(file) => void loadTemplate(file)}
+              onClear={() => { setCustom(null); setMapping({}); }}
+              onMapping={setMapping} />
+
+            <h3 className="font-display mt-8 text-lg font-medium text-ink">Or our layout</h3>
             <p className="mt-1 text-xs leading-relaxed text-ink/55">
               Put your letterhead on every page and leave out the parts your own proforma covers.
             </p>
@@ -351,9 +398,16 @@ export default function Reports() {
                 Word
               </button>
             </div>
+            {custom && (
+              <button type="button" onClick={() => void generate('template')} disabled={Boolean(busy)}
+                className="btn-brand mt-3 w-full rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
+                Fill my own template
+              </button>
+            )}
             <p className="mt-3 text-[11px] leading-relaxed text-ink/50">
-              Word opens in your college's own template for editing; PDF is ready to submit.
-              Your answers are kept in this browser until you clear them.
+              Word opens for editing; PDF is ready to submit. Filling your own template returns that
+              same document with this event written into it. Your answers are kept in this browser
+              until you clear them.
             </p>
             <button type="button" onClick={() => { setStage('folders'); setFolder(null); }}
               className="mt-5 text-xs font-medium text-ink/55">← Choose a different event</button>
