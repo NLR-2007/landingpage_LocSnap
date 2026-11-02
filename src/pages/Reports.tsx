@@ -411,6 +411,10 @@ export default function Reports() {
             <Field label="Feedback" value={fields.feedback} onChange={(v) => set('feedback', v)} rows={3} />
             <Field label="Remarks" value={fields.remarks} onChange={(v) => set('remarks', v)} rows={3} />
 
+            {/* Added sections are our layout's; a college's own template says
+                where its content goes, so they would have nowhere to print. */}
+            {route === 'ours' && (
+            <>
             <div className="mt-8 flex items-center justify-between">
               <Section title="Your own sections" />
               <button type="button"
@@ -459,10 +463,12 @@ export default function Reports() {
                   className="mt-2 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
               </div>
             ))}
+            </>
+            )}
           </div>
 
           <div className="lg:sticky lg:top-8 lg:self-start">
-            {route === 'own' && (
+            {route === 'own' ? (
               <>
                 <h3 className="font-display text-lg font-medium text-ink">Your own Word document</h3>
                 <TemplatePanel doc={custom} mapping={mapping} busy={Boolean(busy)}
@@ -470,11 +476,9 @@ export default function Reports() {
                   onClear={() => { setCustom(null); setMapping({}); }}
                   onMapping={setMapping} />
               </>
-            )}
-
-            <h3 className={`font-display text-lg font-medium text-ink ${route === 'own' ? 'mt-8' : ''}`}>
-              {route === 'own' ? 'Or fall back to our layout' : 'Our layout'}
-            </h3>
+            ) : (
+            <>
+            <h3 className="font-display text-lg font-medium text-ink">Our layout</h3>
             <p className="mt-1 text-xs leading-relaxed text-ink/55">
               Put your letterhead on every page and leave out the parts your own proforma covers.
             </p>
@@ -549,6 +553,8 @@ export default function Reports() {
                 ))}
               </div>
             </details>
+            </>
+            )}
 
             <h3 className="font-display mt-8 text-lg font-medium text-ink">Photographs</h3>
             <p className="mt-1 text-xs text-ink/50">
@@ -584,27 +590,39 @@ export default function Reports() {
               ))}
             </div>
 
-            <div className="mt-8 flex gap-3">
-              <button type="button" onClick={() => void generate('pdf')} disabled={Boolean(busy)}
-                className="btn-brand flex-1 rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
-                PDF
-              </button>
-              <button type="button" onClick={() => void generate('docx')} disabled={Boolean(busy)}
-                className="flex-1 rounded-full border border-line px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-ink/80 disabled:opacity-50">
-                Word
-              </button>
-            </div>
-            {custom && (
-              <button type="button" onClick={() => void generate('template')} disabled={Boolean(busy)}
-                className="btn-brand mt-3 w-full rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
-                Fill my own template
-              </button>
+            {/* One route, one set of buttons. Offering all three invites a
+                college to export our layout by mistake and file it. */}
+            {route === 'own' ? (
+              <>
+                <button type="button" onClick={() => void generate('template')}
+                  disabled={Boolean(busy) || !custom}
+                  className="btn-brand mt-8 w-full rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
+                  Fill my own template
+                </button>
+                <p className="mt-3 text-[11px] leading-relaxed text-ink/50">
+                  {custom
+                    ? 'You get your own document back, with this event written into it. Your answers are kept in this browser until you clear them.'
+                    : 'Upload your template above first, or download the starter and put your letterhead on it.'}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mt-8 flex gap-3">
+                  <button type="button" onClick={() => void generate('pdf')} disabled={Boolean(busy)}
+                    className="btn-brand flex-1 rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
+                    PDF
+                  </button>
+                  <button type="button" onClick={() => void generate('docx')} disabled={Boolean(busy)}
+                    className="flex-1 rounded-full border border-line px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-ink/80 disabled:opacity-50">
+                    Word
+                  </button>
+                </div>
+                <p className="mt-3 text-[11px] leading-relaxed text-ink/50">
+                  Word opens for editing; PDF is ready to submit. Your answers are kept in this
+                  browser until you clear them.
+                </p>
+              </>
             )}
-            <p className="mt-3 text-[11px] leading-relaxed text-ink/50">
-              Word opens for editing; PDF is ready to submit. Filling your own template returns that
-              same document with this event written into it. Your answers are kept in this browser
-              until you clear them.
-            </p>
             <button type="button" onClick={() => { setStage('folders'); setFolder(null); }}
               className="mt-5 text-xs font-medium text-ink/55">← Choose a different event</button>
           </div>
