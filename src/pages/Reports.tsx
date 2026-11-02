@@ -10,11 +10,12 @@ import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
 import { useAuth } from '../lib/auth-context';
 import {
-  connectDrive, inBatches, listEventFolders, listPhotos, photoDataUrl, photoForPrint, photoThumbnail,
+  cachedToken, connectDrive, DriveAuthError, forgetToken, inBatches, listEventFolders,
+  listPhotos, photoDataUrl, photoForPrint, photoThumbnail,
   type DriveFolder, type DrivePhoto,
 } from '../lib/drive';
 import {
-  DEFAULT_TEMPLATE, EMPTY_EVENT, EVENT_TYPES, formatDateTime,
+  DEFAULT_TEMPLATE, EMPTY_EVENT, EVENT_TYPES, PARTICULAR_LABELS, WRITE_UP_HEADINGS, formatDateTime,
   type EventFields, type Report, type ReportPhoto, type ReportTemplate, fileStem,
 } from '../lib/report';
 import { buildPdf } from '../lib/report-pdf';
@@ -26,9 +27,11 @@ import {
 
 const DRAFT_KEY = 'geosnap-report-draft';
 
-type Stage = 'connect' | 'folders' | 'edit';
+type Stage = 'connect' | 'folders' | 'choose' | 'edit';
 /** Our PDF, our Word layout, or the college's own document. */
 type Kind = 'pdf' | 'docx' | 'template';
+/** Whose document this report gets written into. Asked before anything else. */
+type Route = 'ask' | 'own' | 'ours';
 
 export default function Reports() {
   const { user, loading } = useAuth();
@@ -46,6 +49,7 @@ export default function Reports() {
   const [custom, setCustom] = useState<TemplateDoc | null>(null);
   /** Plan B: which paragraph of that template holds what. */
   const [mapping, setMapping] = useState<Record<number, Slot[]>>({});
+  const [route, setRoute] = useState<Route>('ask');
   const [fields, setFields] = useState<EventFields>(EMPTY_EVENT);
   const [template, setTemplate] = useState<ReportTemplate>(DEFAULT_TEMPLATE);
   const [busy, setBusy] = useState<string | null>(null);
@@ -66,11 +70,11 @@ export default function Reports() {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ fields, template }));
   }, [fields, template]);
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (reconsent = false) => {
     setBusy('Asking Google for permission…');
     setError(null);
     try {
-      const granted = await connectDrive();
+      const granted = await connectDrive(reconsent);
       setToken(granted);
       const found = await listEventFolders(granted);
       setFolders(found);
@@ -85,24 +89,68 @@ export default function Reports() {
     }
   }, []);
 
+  /* A token that is still alive survives a reload, so coming back to the page
+     does not mean connecting again. */
+  useEffect(() => {
+    if (token || loading || !user) return;
+    const kept = cachedToken();
+    if (!kept) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const found = await listEventFolders(kept);
+        if (cancelled) return;
+        setToken(kept);
+        setFolders(found);
+        setStage((current) => (current === 'connect' ? 'folders' : current));
+      } catch {
+        // Expired after all; the page simply stays on the connect step.
+        forgetToken();
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [token, loading, user]);
+
+  /**
+   * Runs a piece of Drive work, reconnecting once if the hour has run out.
+   *
+   * Google's browser flow has no refresh token, so the only way back is
+   * another popup. Doing it here means a long export does not fail with a
+   * raw error halfway through a folder.
+   */
+  const withDrive = useCallback(async <T,>(work: (token: string) => Promise<T>): Promise<T> => {
+    const current = token ?? cachedToken();
+    if (!current) throw new DriveAuthError('Connect your Drive to continue.');
+    try {
+      return await work(current);
+    } catch (cause) {
+      if (!(cause instanceof DriveAuthError)) throw cause;
+      setBusy('The Drive connection expired - reconnecting…');
+      const granted = await connectDrive();
+      setToken(granted);
+      return await work(granted);
+    }
+  }, [token]);
+
   async function openFolder(target: DriveFolder) {
-    if (!token) return;
     setBusy('Reading photographs…');
     setError(null);
     try {
-      const found = await listPhotos(token, target.id);
+      const { found, granted } = await withDrive(async (active) => ({
+        found: await listPhotos(active, target.id), granted: active,
+      }));
       setFolder(target);
       setPhotos(found);
       setChosen(new Set(found.map((p) => p.id)));
       setThumbs({});
       // The grid is usable before the pictures land, so the thumbnails are
       // fetched in the background, a few at a time, and appear as they come.
-      void loadThumbs(token, found);
+      void loadThumbs(granted, found);
       setFields((current) => ({
         ...current,
         title: current.title || target.name.replace(/_/g, ' '),
       }));
-      setStage('edit');
+      setStage(route === 'ask' ? 'choose' : 'edit');
     } catch (cause) {
       setError((cause as Error).message);
     } finally {
@@ -124,9 +172,8 @@ export default function Reports() {
   /** Full size, fetched on demand - a preview should not cost a whole folder. */
   async function openPreview(photo: DrivePhoto) {
     setPreview({ photo, dataUrl: thumbs[photo.id] ?? null });
-    if (!token) return;
     try {
-      const full = await photoDataUrl(token, photo.id);
+      const full = await withDrive((active) => photoDataUrl(active, photo.id));
       setPreview((current) => (current?.photo.id === photo.id ? { photo, dataUrl: full } : current));
     } catch (cause) {
       setError((cause as Error).message);
@@ -158,7 +205,7 @@ export default function Reports() {
   const label = (kind: Kind) => (kind === 'pdf' ? 'PDF' : 'Word file');
 
   async function generate(kind: Kind) {
-    if (!token || !folder) return;
+    if (!folder) return;
     if (kind === 'template' && !custom) return;
     setBusy(`Building the ${label(kind)}…`);
     setError(null);
@@ -170,7 +217,7 @@ export default function Reports() {
         setBusy(`Fetching photograph ${withImages.length + 1} of ${selected.length}…`);
         withImages.push({
           id: photo.id, name: photo.name, takenAt: photo.takenAt,
-          dataUrl: await photoForPrint(token, photo.id),
+          dataUrl: await withDrive((active) => photoForPrint(active, photo.id)),
         });
       }
       const report: Report = { fields, template, photos: withImages, folderName: folder.name };
@@ -233,12 +280,22 @@ export default function Reports() {
             className="btn-brand mt-6 rounded-full px-8 py-3 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50">
             Connect Drive
           </button>
+          <p className="mt-4 text-xs text-ink/50">
+            Google's permission lasts about an hour. It is reused for as long as it is good and
+            renewed when it runs out, so you should not have to do this often.{' '}
+            <button type="button" onClick={() => { forgetToken(); void connect(true); }}
+              className="font-medium text-green">Use a different Google account</button>
+          </p>
         </div>
       )}
 
       {stage === 'folders' && (
         <div className="mt-8">
-          <h2 className="font-display text-xl font-medium text-ink">Choose an event</h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="font-display text-xl font-medium text-ink">Choose an event</h2>
+            <button type="button" onClick={() => { forgetToken(); setToken(null); void connect(true); }}
+              className="text-xs font-medium text-ink/55">Reconnect or switch account</button>
+          </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {folders.map((item) => (
               <button key={item.id} type="button" onClick={() => void openFolder(item)}
@@ -251,11 +308,57 @@ export default function Reports() {
         </div>
       )}
 
+      {stage === 'choose' && folder && (
+        <div className="mt-8 max-w-3xl">
+          <h2 className="font-display text-xl font-medium text-ink">
+            Which document should this report go into?
+          </h2>
+          <p className="mt-1 text-sm text-ink/60">
+            {folder.name.replace(/_/g, ' ')} · {photos.length} photograph(s) found
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <button type="button" onClick={() => { setRoute('own'); setStage('edit'); }}
+              className="rounded-2xl border border-line bg-card p-6 text-left transition hover:border-green/50">
+              <span className="block font-display text-lg font-medium text-ink">
+                My institution's own template
+              </span>
+              <span className="mt-2 block text-sm leading-relaxed text-ink/60">
+                Upload the Word file your office already files. Your letterhead, margins, fonts and
+                proforma are kept exactly as they are - this event's details are written into it.
+              </span>
+              <span className="mt-3 block text-xs font-medium text-green">Recommended for colleges →</span>
+            </button>
+
+            <button type="button" onClick={() => { setRoute('ours'); setStage('edit'); }}
+              className="rounded-2xl border border-line bg-card p-6 text-left transition hover:border-green/50">
+              <span className="block font-display text-lg font-medium text-ink">
+                Build one for me
+              </span>
+              <span className="mt-2 block text-sm leading-relaxed text-ink/60">
+                A ready report - cover, particulars, write-up, photographs, annexure and signature
+                lines. Add your own sections, remove any you do not need, and put your letterhead on
+                top.
+              </span>
+              <span className="mt-3 block text-xs font-medium text-green">Nothing to upload →</span>
+            </button>
+          </div>
+
+          <button type="button" onClick={() => { setStage('folders'); setFolder(null); }}
+            className="mt-6 text-xs font-medium text-ink/55">← Choose a different event</button>
+        </div>
+      )}
+
       {stage === 'edit' && folder && (
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <h2 className="font-display text-xl font-medium text-ink">{folder.name.replace(/_/g, ' ')}</h2>
-            <p className="mt-1 text-sm text-ink/55">{selected.length} of {photos.length} photograph(s) selected</p>
+            <p className="mt-1 text-sm text-ink/55">
+              {selected.length} of {photos.length} photograph(s) selected ·{' '}
+              {route === 'own' ? 'your own template' : 'our layout'}
+              <button type="button" onClick={() => setStage('choose')}
+                className="ml-2 font-medium text-green">change</button>
+            </p>
 
             <Section title="Institution" />
             <Field label="College / institution name" value={fields.institutionName} onChange={(v) => set('institutionName', v)} />
@@ -307,16 +410,71 @@ export default function Reports() {
             <Field label="Beneficiaries" value={fields.beneficiaries} onChange={(v) => set('beneficiaries', v)} rows={2} />
             <Field label="Feedback" value={fields.feedback} onChange={(v) => set('feedback', v)} rows={3} />
             <Field label="Remarks" value={fields.remarks} onChange={(v) => set('remarks', v)} rows={3} />
+
+            <div className="mt-8 flex items-center justify-between">
+              <Section title="Your own sections" />
+              <button type="button"
+                onClick={() => setTemplate((t) => ({
+                  ...t,
+                  extraSections: [
+                    ...t.extraSections,
+                    { id: `s${Date.now()}`, heading: '', body: '' },
+                  ],
+                }))}
+                className="mt-8 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink/70">
+                + Add a section
+              </button>
+            </div>
+            <p className="text-xs leading-relaxed text-ink/55">
+              For anything your proforma asks for that is not above - a NAAC criterion, an
+              attendance summary, an action taken report. These print after the standard sections.
+            </p>
+            {template.extraSections.map((section, index) => (
+              <div key={section.id} className="mt-4 rounded-2xl border border-line p-4">
+                <div className="flex items-center gap-2">
+                  <input value={section.heading} placeholder={`Heading for section ${index + 1}`}
+                    onChange={(event) => setTemplate((t) => ({
+                      ...t,
+                      extraSections: t.extraSections.map((item) => (
+                        item.id === section.id ? { ...item, heading: event.target.value } : item
+                      )),
+                    }))}
+                    className="flex-1 rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
+                  <button type="button" aria-label="Delete this section"
+                    onClick={() => setTemplate((t) => ({
+                      ...t,
+                      extraSections: t.extraSections.filter((item) => item.id !== section.id),
+                    }))}
+                    className="shrink-0 rounded-full border border-line px-3 py-2 text-xs font-medium text-ink/55">
+                    Delete
+                  </button>
+                </div>
+                <textarea value={section.body} rows={4} placeholder="What this section says"
+                  onChange={(event) => setTemplate((t) => ({
+                    ...t,
+                    extraSections: t.extraSections.map((item) => (
+                      item.id === section.id ? { ...item, body: event.target.value } : item
+                    )),
+                  }))}
+                  className="mt-2 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
+              </div>
+            ))}
           </div>
 
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <h3 className="font-display text-lg font-medium text-ink">Your own Word document</h3>
-            <TemplatePanel doc={custom} mapping={mapping} busy={Boolean(busy)}
-              onUpload={(file) => void loadTemplate(file)}
-              onClear={() => { setCustom(null); setMapping({}); }}
-              onMapping={setMapping} />
+            {route === 'own' && (
+              <>
+                <h3 className="font-display text-lg font-medium text-ink">Your own Word document</h3>
+                <TemplatePanel doc={custom} mapping={mapping} busy={Boolean(busy)}
+                  onUpload={(file) => void loadTemplate(file)}
+                  onClear={() => { setCustom(null); setMapping({}); }}
+                  onMapping={setMapping} />
+              </>
+            )}
 
-            <h3 className="font-display mt-8 text-lg font-medium text-ink">Or our layout</h3>
+            <h3 className={`font-display text-lg font-medium text-ink ${route === 'own' ? 'mt-8' : ''}`}>
+              {route === 'own' ? 'Or fall back to our layout' : 'Our layout'}
+            </h3>
             <p className="mt-1 text-xs leading-relaxed text-ink/55">
               Put your letterhead on every page and leave out the parts your own proforma covers.
             </p>
@@ -345,14 +503,52 @@ export default function Reports() {
                 ['includePhotos', 'Photographs'],
                 ['includeAnnexure', 'Annexure index'],
                 ['includeSignatures', 'Signature lines'],
-              ] as const).map(([key, label]) => (
+              ] as const).map(([key, caption]) => (
                 <label key={key} className="flex items-center gap-2 text-sm text-ink/70">
                   <input type="checkbox" checked={template[key]}
                     onChange={(e) => setTemplate((t) => ({ ...t, [key]: e.target.checked }))} />
-                  {label}
+                  {caption}
                 </label>
               ))}
             </div>
+
+            <details className="mt-4">
+              <summary className="cursor-pointer text-xs font-medium text-green">
+                Leave out particular rows or headings
+              </summary>
+              <p className="mt-2 text-[11px] leading-relaxed text-ink/55">
+                Untick anything your proforma does not ask for. Rows you left blank are already
+                left out.
+              </p>
+              <div className="mt-2 space-y-1.5">
+                {PARTICULAR_LABELS.map((item) => (
+                  <label key={item} className="flex items-center gap-2 text-xs text-ink/65">
+                    <input type="checkbox" checked={!template.omitParticulars.includes(item)}
+                      onChange={(event) => setTemplate((t) => ({
+                        ...t,
+                        omitParticulars: event.target.checked
+                          ? t.omitParticulars.filter((label) => label !== item)
+                          : [...t.omitParticulars, item],
+                      }))} />
+                    {item}
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 space-y-1.5 border-t border-line pt-3">
+                {WRITE_UP_HEADINGS.map((item) => (
+                  <label key={item} className="flex items-center gap-2 text-xs text-ink/65">
+                    <input type="checkbox" checked={!template.omitSections.includes(item)}
+                      onChange={(event) => setTemplate((t) => ({
+                        ...t,
+                        omitSections: event.target.checked
+                          ? t.omitSections.filter((heading) => heading !== item)
+                          : [...t.omitSections, item],
+                      }))} />
+                    {item}
+                  </label>
+                ))}
+              </div>
+            </details>
 
             <h3 className="font-display mt-8 text-lg font-medium text-ink">Photographs</h3>
             <p className="mt-1 text-xs text-ink/50">

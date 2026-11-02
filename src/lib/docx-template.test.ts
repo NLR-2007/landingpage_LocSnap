@@ -21,7 +21,9 @@ if (!globals.atob) globals.atob = (value: string) => Buffer.from(value, 'base64'
 
 const { unzipSync, zipSync, strToU8, strFromU8 } = await import('fflate');
 const { readTemplate, markerPlan, fillTemplate } = await import('./docx-template');
-const { EMPTY_EVENT } = await import('./report');
+const {
+  EMPTY_EVENT, PARTICULAR_LABELS, WRITE_UP_HEADINGS, particulars, sections,
+} = await import('./report');
 
 /** A one-pixel JPEG, enough to be a real image part. */
 const PIXEL = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a'
@@ -70,6 +72,7 @@ function report(): Report {
       letterheadDataUrl: null, footerDataUrl: null, photosPerPage: 2,
       includeCover: true, includeParticulars: true, includeWriteUp: true,
       includePhotos: true, includeAnnexure: true, includeSignatures: true,
+      extraSections: [], omitParticulars: [], omitSections: [],
     },
     photos: [
       { id: 'a', name: 'one.jpg', takenAt: '2026-11-02T12:37:00.000Z', dataUrl: PIXEL },
@@ -175,6 +178,44 @@ test('plan B fills a template that has no markers at all', async () => {
   assert.match(xml, /r:embed="rIdGeoSnap1"/);
   // "Photographs:" was a real line, not a marker, so it is kept.
   assert.match(xml, /Photographs:/);
+});
+
+test('every row and heading a report can print can also be switched off', () => {
+  // A row added to particulars() but not to the list would be one the user is
+  // shown no way to remove. Checked with every field filled, so nothing is
+  // dropped for being blank.
+  const filled = report();
+  Object.keys(filled.fields).forEach((key) => {
+    const field = key as keyof typeof filled.fields;
+    if (!filled.fields[field]) filled.fields[field] = '7';
+  });
+  assert.deepEqual(particulars(filled).map((row) => row.label), PARTICULAR_LABELS);
+  assert.deepEqual(sections(filled).map((section) => section.heading), WRITE_UP_HEADINGS);
+});
+
+test('a switched-off row or heading really does not print', () => {
+  const trimmed = report();
+  Object.keys(trimmed.fields).forEach((key) => {
+    const field = key as keyof typeof trimmed.fields;
+    if (!trimmed.fields[field]) trimmed.fields[field] = '7';
+  });
+  trimmed.template.omitParticulars = ['Venue', 'Sponsor'];
+  trimmed.template.omitSections = ['Feedback'];
+  const labels = particulars(trimmed).map((row) => row.label);
+  assert.ok(!labels.includes('Venue') && !labels.includes('Sponsor'));
+  assert.ok(!sections(trimmed).map((s) => s.heading).includes('Feedback'));
+});
+
+test('a section the user added prints after the standard ones', () => {
+  const extended = report();
+  extended.fields.objectives = 'To teach database design.';
+  extended.template.extraSections = [
+    { id: 'a', heading: 'Criterion 3.4.2', body: 'Extension activity, 60 participants.' },
+    { id: 'b', heading: '', body: 'A section with no heading still needs one.' },
+    { id: 'c', heading: 'Empty', body: '   ' },
+  ];
+  const headings = sections(extended).map((section) => section.heading);
+  assert.deepEqual(headings, ['Objectives', 'Criterion 3.4.2', 'Additional notes']);
 });
 
 test('a file that is not a .docx is refused in words a person can act on', async () => {

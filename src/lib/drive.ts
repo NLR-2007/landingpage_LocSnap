@@ -27,21 +27,84 @@ export type DrivePhoto = {
 
 const API = 'https://www.googleapis.com/drive/v3';
 
+/** Raised when the Drive token has expired or been withdrawn. */
+export class DriveAuthError extends Error {
+  constructor(message = 'The Drive connection expired.') {
+    super(message);
+    this.name = 'DriveAuthError';
+  }
+}
+
+/* The connection kept coming undone, for three separate reasons.
+
+   Google's token lasts about an hour and the browser flow gives no refresh
+   token, so it cannot simply be kept alive. It was also held in React state
+   alone, so every reload threw it away even while still valid. And consent was
+   demanded on every single connect, so re-linking meant working through the
+   permission screen again rather than a popup that flashes and closes.
+
+   So: the token is stored with its expiry and reused until it runs out,
+   consent is asked for once rather than always, and an expired token is
+   recognised as its own kind of failure the page can act on. */
+const TOKEN_KEY = 'geosnap-drive-token';
+
+type StoredToken = { token: string; expiresAt: number };
+
+/** The stored token, if there is one and it has life left in it. */
+export function cachedToken(): string | null {
+  try {
+    const raw = sessionStorage.getItem(TOKEN_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as StoredToken;
+    // A minute's grace, so a long export does not die halfway through.
+    if (!stored.token || stored.expiresAt - 60_000 < Date.now()) {
+      sessionStorage.removeItem(TOKEN_KEY);
+      return null;
+    }
+    return stored.token;
+  } catch {
+    return null;
+  }
+}
+
+export function forgetToken() {
+  try { sessionStorage.removeItem(TOKEN_KEY); } catch { /* private mode */ }
+}
+
+function rememberToken(token: string, lifetimeSeconds = 3500) {
+  try {
+    const stored: StoredToken = { token, expiresAt: Date.now() + lifetimeSeconds * 1000 };
+    sessionStorage.setItem(TOKEN_KEY, JSON.stringify(stored));
+  } catch { /* private mode - the token simply lives in memory */ }
+}
+
 /**
  * Asks Google for permission to read what the app created.
  *
  * A provider of its own, never the shared one: adding this scope to the
  * sign-in provider would ask every visitor for their Drive merely to log in.
+ *
+ * `reconsent` is for the case where the user wants to switch account or has
+ * revoked access; ordinarily Google is left to decide whether to ask, which it
+ * does not once permission has been given.
  */
-export async function connectDrive(): Promise<string> {
+export async function connectDrive(reconsent = false): Promise<string> {
   if (!auth) throw new Error('Sign-in is not configured on this site.');
   const provider = new GoogleAuthProvider();
   provider.addScope(DRIVE_SCOPE);
-  provider.setCustomParameters({ prompt: 'consent' });
+  if (reconsent) provider.setCustomParameters({ prompt: 'consent select_account' });
   const result = await signInWithPopup(auth, provider);
   const token = GoogleAuthProvider.credentialFromResult(result)?.accessToken;
   if (!token) throw new Error('Google did not return permission to read Drive.');
+  rememberToken(token);
   return token;
+}
+
+function authFailure(status: number, message: string | undefined): boolean {
+  if (status === 401) return true;
+  // Drive answers 403 for quota as well as for permission, and only one of
+  // those is fixed by connecting again.
+  return status === 403 && /auth|credential|permission|insufficient|scope/i.test(message ?? '');
 }
 
 async function get<T>(token: string, path: string): Promise<T> {
@@ -50,7 +113,12 @@ async function get<T>(token: string, path: string): Promise<T> {
   });
   const body = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(body?.error?.message ?? `Drive request failed (${response.status}).`);
+    const message = body?.error?.message as string | undefined;
+    if (authFailure(response.status, message)) {
+      forgetToken();
+      throw new DriveAuthError();
+    }
+    throw new Error(message ?? `Drive request failed (${response.status}).`);
   }
   return body as T;
 }
@@ -114,7 +182,13 @@ export async function downloadPhoto(token: string, fileId: string): Promise<Blob
   const response = await fetch(`${API}/files/${fileId}?alt=media`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!response.ok) throw new Error(`Could not read a photograph (${response.status}).`);
+  if (!response.ok) {
+    if (authFailure(response.status, undefined)) {
+      forgetToken();
+      throw new DriveAuthError();
+    }
+    throw new Error(`Could not read a photograph (${response.status}).`);
+  }
   return response.blob();
 }
 

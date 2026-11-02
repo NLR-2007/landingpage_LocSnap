@@ -81,6 +81,17 @@ export type ReportTemplate = {
   includeAnnexure: boolean;
   /** The signature lines a filed report is not accepted without. */
   includeSignatures: boolean;
+  /**
+   * Headings this report needs and the built-in set does not have.
+   *
+   * No field list predicts what a proforma asks for - "Criterion 3.4.2",
+   * "Attendance summary", "Action taken report" - so the user adds them.
+   */
+  extraSections: { id: string; heading: string; body: string }[];
+  /** Particulars rows to leave out, by label. */
+  omitParticulars: string[];
+  /** Built-in write-up headings to leave out. */
+  omitSections: string[];
 };
 
 export const DEFAULT_TEMPLATE: ReportTemplate = {
@@ -93,6 +104,9 @@ export const DEFAULT_TEMPLATE: ReportTemplate = {
   includePhotos: true,
   includeAnnexure: true,
   includeSignatures: true,
+  extraSections: [],
+  omitParticulars: [],
+  omitSections: [],
 };
 
 export type Report = {
@@ -156,6 +170,25 @@ export function dateRange(report: Report): string {
   return first === last ? first : `${first} to ${last}`;
 }
 
+/**
+ * The rows and headings a user may switch off.
+ *
+ * Kept beside the functions that produce them, and checked against those
+ * functions by a test, so a row added below cannot quietly become one nobody
+ * can remove.
+ */
+export const PARTICULAR_LABELS = [
+  'Type of activity', 'Title', 'Theme', 'Organising department', 'Academic year', 'Date',
+  'Venue', 'Mode', 'Collaborating agency', 'Sponsor', 'Budget / expenditure', 'Coordinator',
+  'Co-coordinator', 'Resource person', 'Topic covered', 'Chief guest', 'Participants',
+  'Photographs attached',
+];
+
+export const WRITE_UP_HEADINGS = [
+  'Objectives', 'Description of the activity', 'Outcome', 'Impact and benefit',
+  'Beneficiaries', 'Feedback', 'Remarks',
+];
+
 /** Label and value, with the blanks dropped - a report should not print "Venue: —". */
 export function particulars(report: Report): { label: string; value: string }[] {
   const f = report.fields;
@@ -188,7 +221,10 @@ export function particulars(report: Report): { label: string; value: string }[] 
     { label: 'Chief guest', value: f.chiefGuest },
     { label: 'Participants', value: participants },
     { label: 'Photographs attached', value: report.photos.length ? String(report.photos.length) : '' },
-  ].map((row) => ({ ...row, value: row.value.trim() })).filter((row) => !blank(row.value));
+  ]
+    .map((row) => ({ ...row, value: row.value.trim() }))
+    .filter((row) => !blank(row.value))
+    .filter((row) => !report.template.omitParticulars?.includes(row.label));
 }
 
 /** "Name, designation", dropping whichever half was left unanswered. */
@@ -206,7 +242,14 @@ export function sections(report: Report): { heading: string; body: string }[] {
     { heading: 'Beneficiaries', body: f.beneficiaries },
     { heading: 'Feedback', body: f.feedback },
     { heading: 'Remarks', body: f.remarks },
-  ].filter((section) => !blank(section.body));
+    // Added by the user, in the order they added them, after the standard set.
+    ...(report.template.extraSections ?? []).map((section) => ({
+      heading: section.heading.trim() || 'Additional notes',
+      body: section.body,
+    })),
+  ]
+    .filter((section) => !blank(section.body))
+    .filter((section) => !report.template.omitSections?.includes(section.heading));
 }
 
 export function fileStem(report: Report): string {
