@@ -297,6 +297,7 @@ export default function Reports() {
                 ['includeWriteUp', 'Write-up sections'],
                 ['includePhotos', 'Photographs'],
                 ['includeAnnexure', 'Annexure index'],
+                ['includeSignatures', 'Signature lines'],
               ] as const).map(([key, label]) => (
                 <label key={key} className="flex items-center gap-2 text-sm text-ink/70">
                   <input type="checkbox" checked={template[key]}

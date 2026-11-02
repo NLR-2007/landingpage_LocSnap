@@ -12,7 +12,9 @@ import {
   AlignmentType, BorderStyle, Document, HeadingLevel, ImageRun, Packer,
   Paragraph, Table, TableCell, TableRow, TextRun, WidthType,
 } from 'docx';
-import { dateRange, formatDateTime, particulars, sections, type Report } from './report';
+import {
+  blank, dateRange, departmentLine, formatDateTime, particulars, sections, type Report,
+} from './report';
 
 export async function buildDocx(report: Report): Promise<Blob> {
   const f = report.fields;
@@ -25,22 +27,24 @@ export async function buildDocx(report: Report): Promise<Blob> {
   }
 
   if (t.includeCover) {
-    children.push(
-      centred(f.institutionName, 32, true),
-      centred(f.institutionUniversity, 22),
-      centred(f.institutionAddress, 18),
-    );
-    if (f.department) children.push(centred(`Department of ${f.department}`, 22, true));
-    children.push(
-      new Paragraph({ text: '' }),
-      centred('ACTIVITY REPORT', 24, true),
-      centred(f.title, 30, true),
-      centred(f.subtitle, 22),
-      centred(f.eventType, 20),
-      centred(dateRange(report), 20),
-      centred(f.venue, 18),
-      new Paragraph({ children: [], pageBreakBefore: false }),
-    );
+    const show = (value: string) => (blank(value) ? '' : value.trim());
+    [
+      [show(f.institutionName), 32, true],
+      [show(f.institutionUniversity), 22, false],
+      [show(f.institutionAddress), 18, false],
+      [departmentLine(f.department), 22, true],
+      ['', 0, false],
+      ['ACTIVITY REPORT', 24, true],
+      [show(f.title), 30, true],
+      [show(f.subtitle), 22, false],
+      [show(f.eventType), 20, false],
+      [show(dateRange(report)), 20, false],
+      [show(f.venue), 18, false],
+      [show(f.academicYear) && `Academic year ${show(f.academicYear)}`, 18, false],
+    ].forEach(([text, size, strong]) => {
+      if (text === '') children.push(new Paragraph({ text: '' }));
+      else if (text) children.push(centred(text as string, size as number, strong as boolean));
+    });
   }
 
   if (t.includeParticulars) {
@@ -103,6 +107,25 @@ export async function buildDocx(report: Report): Promise<Blob> {
     }));
   }
 
+  if (t.includeSignatures) {
+    children.push(new Paragraph({ text: '' }), new Paragraph({ text: '' }), new Paragraph({ text: '' }));
+    const signed = blank(f.coordinator) ? '' : `(${f.coordinator.trim()})`;
+    children.push(new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: none(),
+      rows: [new TableRow({
+        children: [
+          ['Event Coordinator', signed],
+          ['Head of the Department', ''],
+          ['Principal / Director', ''],
+        ].map(([role, name]) => new TableCell({
+          width: { size: 33, type: WidthType.PERCENTAGE },
+          children: [centred(name, 17), centred('________________', 17), centred(role, 18, true)],
+        })),
+      })],
+    }));
+  }
+
   children.push(new Paragraph({ text: '' }));
   children.push(new Paragraph({
     children: [new TextRun({
@@ -128,6 +151,12 @@ function plain(text: string): Paragraph {
 
 function bold(text: string): Paragraph {
   return new Paragraph({ children: [new TextRun({ text: text || '', bold: true, size: 19 })] });
+}
+
+/** Signature cells need the grid, not its lines. */
+function none() {
+  const side = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  return { top: side, bottom: side, left: side, right: side, insideHorizontal: side, insideVertical: side };
 }
 
 function grey() {

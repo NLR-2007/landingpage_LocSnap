@@ -62,6 +62,7 @@ export const EMPTY_EVENT: EventFields = {
 
 export const EVENT_TYPES = [
   'NSS camp / activity', 'NCC camp / activity', 'Workshop', 'Seminar', 'Conference',
+  'Hackathon / coding contest', 'Technical competition', 'Project expo',
   'Faculty development programme', 'Guest lecture', 'Industrial visit', 'Field work / survey',
   'Placement drive', 'Plantation drive', 'Awareness rally', 'Blood donation camp',
   'Health / medical camp', 'Community service', 'Sports event', 'Cultural event',
@@ -78,6 +79,8 @@ export type ReportTemplate = {
   includeWriteUp: boolean;
   includePhotos: boolean;
   includeAnnexure: boolean;
+  /** The signature lines a filed report is not accepted without. */
+  includeSignatures: boolean;
 };
 
 export const DEFAULT_TEMPLATE: ReportTemplate = {
@@ -89,6 +92,7 @@ export const DEFAULT_TEMPLATE: ReportTemplate = {
   includeWriteUp: true,
   includePhotos: true,
   includeAnnexure: true,
+  includeSignatures: true,
 };
 
 export type Report = {
@@ -97,6 +101,29 @@ export type Report = {
   photos: ReportPhoto[];
   folderName: string;
 };
+
+/**
+ * Whether a field is effectively empty.
+ *
+ * People fill a form by typing "NA" into every box they have no answer for,
+ * which defeats dropping blanks: a filed report then reads "Venue: NA, Chief
+ * guest: NA, Sponsor: NA" down the page. A row with nothing to say is better
+ * left out than printed as nothing. Square brackets catch a prompt that was
+ * pasted in and never replaced, like "[Enter your campus's official address]".
+ */
+export function blank(value: string | null | undefined): boolean {
+  const text = (value ?? '').trim();
+  if (!text) return true;
+  if (/^\[.*\]$/.test(text)) return true;
+  return /^(na|n\/a|n\.a\.?|nil|none|not applicable|-{1,3}|\.)$/i.test(text);
+}
+
+/** The department line, without repeating a word the user already typed. */
+export function departmentLine(department: string): string {
+  if (blank(department)) return '';
+  const name = department.trim();
+  return /^dept\b|^department\b/i.test(name) ? name : `Department of ${name}`;
+}
 
 export function formatDate(value: string | null): string {
   if (!value) return '';
@@ -132,17 +159,21 @@ export function dateRange(report: Report): string {
 /** Label and value, with the blanks dropped - a report should not print "Venue: —". */
 export function particulars(report: Report): { label: string; value: string }[] {
   const f = report.fields;
+  // A count only earns its noun if it is actually a number; "NA students" is
+  // worse than saying nothing about students at all.
+  const count = (value: string, noun: string) =>
+    /^\d[\d,]*$/.test(value.trim()) ? `${value.trim()} ${noun}` : '';
   const participants = [
-    f.studentsCount && `${f.studentsCount} students`,
-    f.facultyCount && `${f.facultyCount} faculty`,
-    f.externalCount && `${f.externalCount} external`,
+    count(f.studentsCount, 'students'),
+    count(f.facultyCount, 'faculty'),
+    count(f.externalCount, 'external'),
   ].filter(Boolean).join(', ');
 
   return [
     { label: 'Type of activity', value: f.eventType },
     { label: 'Title', value: f.title },
     { label: 'Theme', value: f.subtitle },
-    { label: 'Organising department', value: f.department },
+    { label: 'Organising department', value: departmentLine(f.department) },
     { label: 'Academic year', value: f.academicYear },
     { label: 'Date', value: dateRange(report) },
     { label: 'Venue', value: f.venue },
@@ -150,14 +181,19 @@ export function particulars(report: Report): { label: string; value: string }[] 
     { label: 'Collaborating agency', value: f.collaboratingAgency },
     { label: 'Sponsor', value: f.sponsor },
     { label: 'Budget / expenditure', value: f.budget },
-    { label: 'Coordinator', value: [f.coordinator, f.coordinatorDesignation].filter(Boolean).join(', ') },
+    { label: 'Coordinator', value: pair(f.coordinator, f.coordinatorDesignation) },
     { label: 'Co-coordinator', value: f.coCoordinator },
-    { label: 'Resource person', value: [f.resourcePerson, f.resourceAffiliation].filter(Boolean).join(', ') },
+    { label: 'Resource person', value: pair(f.resourcePerson, f.resourceAffiliation) },
     { label: 'Topic covered', value: f.resourceTopic },
     { label: 'Chief guest', value: f.chiefGuest },
     { label: 'Participants', value: participants },
     { label: 'Photographs attached', value: report.photos.length ? String(report.photos.length) : '' },
-  ].filter((row) => row.value.trim().length > 0);
+  ].filter((row) => !blank(row.value));
+}
+
+/** "Name, designation", dropping whichever half was left unanswered. */
+function pair(first: string, second: string): string {
+  return [first, second].filter((part) => !blank(part)).map((part) => part.trim()).join(', ');
 }
 
 export function sections(report: Report): { heading: string; body: string }[] {
@@ -170,7 +206,7 @@ export function sections(report: Report): { heading: string; body: string }[] {
     { heading: 'Beneficiaries', body: f.beneficiaries },
     { heading: 'Feedback', body: f.feedback },
     { heading: 'Remarks', body: f.remarks },
-  ].filter((section) => section.body.trim().length > 0);
+  ].filter((section) => !blank(section.body));
 }
 
 export function fileStem(report: Report): string {

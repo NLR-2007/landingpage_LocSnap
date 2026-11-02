@@ -8,7 +8,7 @@
    three pages rather than running off the edge of one. */
 import { jsPDF } from 'jspdf';
 import {
-  dateRange, formatDateTime, particulars, sections, type Report,
+  blank, dateRange, departmentLine, formatDateTime, particulars, sections, type Report,
 } from './report';
 
 const PAGE_W = 595;
@@ -47,8 +47,51 @@ export async function buildPdf(report: Report): Promise<Blob> {
   if (t.includeWriteUp) writeUp(doc, report, cursor, room);
   if (t.includePhotos) await photoPages(doc, report, cursor, room, newPage, bottom);
   if (t.includeAnnexure) annexure(doc, report, cursor, room, newPage);
+  if (t.includeSignatures) signatures(doc, report, cursor, room, bottom);
 
+  pageNumbers(doc, footerH);
   return doc.output('blob');
+}
+
+/**
+ * Signature lines. A report nobody has signed is not a filed report; the
+ * coordinator, the head of department and the principal sign every one.
+ */
+function signatures(
+  doc: jsPDF, report: Report, cursor: Cursor,
+  room: (n: number) => void, bottom: () => number
+) {
+  room(90);
+  cursor.y = Math.max(cursor.y + 50, bottom() - 70);
+  const names = [
+    report.fields.coordinator && !blank(report.fields.coordinator)
+      ? `(${report.fields.coordinator.trim()})` : '',
+    '', '',
+  ];
+  const roles = ['Event Coordinator', 'Head of the Department', 'Principal / Director'];
+  const slot = CONTENT_W / 3;
+
+  doc.setDrawColor(150);
+  roles.forEach((role, index) => {
+    const centre = MARGIN + slot * index + slot / 2;
+    doc.line(centre - 60, cursor.y, centre + 60, cursor.y);
+    doc.setFont('times', 'normal').setFontSize(9);
+    if (names[index]) doc.text(names[index], centre, cursor.y - 4, { align: 'center' });
+    doc.setFont('times', 'bold');
+    doc.text(role, centre, cursor.y + 12, { align: 'center' });
+  });
+  cursor.y += 20;
+}
+
+/** "Page n of m", which a report that is read in a bound file needs. */
+function pageNumbers(doc: jsPDF, footerH: number) {
+  const total = doc.getNumberOfPages();
+  for (let page = 1; page <= total; page += 1) {
+    doc.setPage(page);
+    doc.setFont('times', 'normal').setFontSize(8).setTextColor(130);
+    doc.text(`Page ${page} of ${total}`, PAGE_W / 2, PAGE_H - MARGIN / 2 - footerH - 6, { align: 'center' });
+    doc.setTextColor(0);
+  }
 }
 
 function centred(doc: jsPDF, text: string, y: number, size: number, bold = false): number {
@@ -63,21 +106,31 @@ function centred(doc: jsPDF, text: string, y: number, size: number, bold = false
 
 function cover(doc: jsPDF, report: Report, cursor: Cursor, newPage: () => void, bottom: () => number) {
   const f = report.fields;
+  const show = (value: string) => (blank(value) ? '' : value.trim());
+
+  // The heading block sits at the top; the title block is centred in the space
+  // left over, so a cover is not all text at the top and a page of white below.
   let y = cursor.y + 30;
-  y = centred(doc, f.institutionName, y, 20, true) + 6;
-  y = centred(doc, f.institutionUniversity, y, 12) + 2;
-  y = centred(doc, f.institutionAddress, y, 10) + 4;
-  if (f.department) y = centred(doc, `Department of ${f.department}`, y, 12, true) + 10;
+  y = centred(doc, show(f.institutionName), y, 20, true) + 6;
+  y = centred(doc, show(f.institutionUniversity), y, 12) + 2;
+  y = centred(doc, show(f.institutionAddress), y, 10) + 4;
+  const department = departmentLine(f.department);
+  if (department) y = centred(doc, department, y, 12, true) + 10;
 
   doc.setDrawColor(190).line(MARGIN + 60, y, PAGE_W - MARGIN - 60, y);
-  y += 34;
 
-  y = centred(doc, 'ACTIVITY REPORT', y, 13, true) + 14;
-  y = centred(doc, f.title, y, 18, true) + 6;
-  y = centred(doc, f.subtitle, y, 12) + 18;
-  y = centred(doc, f.eventType, y, 12) + 4;
-  y = centred(doc, dateRange(report), y, 12) + 4;
-  centred(doc, f.venue, y, 10);
+  const lines = [
+    { text: 'ACTIVITY REPORT', size: 13, bold: true, gap: 20 },
+    { text: show(f.title), size: 20, bold: true, gap: 8 },
+    { text: show(f.subtitle), size: 12, bold: false, gap: 24 },
+    { text: show(f.eventType), size: 12, bold: false, gap: 6 },
+    { text: show(dateRange(report)), size: 12, bold: false, gap: 6 },
+    { text: show(f.venue), size: 11, bold: false, gap: 6 },
+    { text: show(f.academicYear) && `Academic year ${show(f.academicYear)}`, size: 11, bold: false, gap: 0 },
+  ].filter((line) => line.text);
+  const blockH = lines.reduce((total, line) => total + line.size + 4 + line.gap, 0);
+  y = Math.max(y + 40, (y + bottom()) / 2 - blockH / 2);
+  lines.forEach((line) => { y = centred(doc, line.text, y, line.size, line.bold) + line.gap; });
 
   doc.setFont('times', 'normal').setFontSize(8).setTextColor(130);
   doc.text(
@@ -165,10 +218,12 @@ async function photoPages(
     doc.setDrawColor(210).rect(left, cursor.y, w, h);
     cursor.y += h + 8;
 
+    // Under the photograph, not at the far margin: a portrait phone picture is
+    // narrow, and a caption stranded at the page edge reads as a stray line.
     doc.setFontSize(9);
     caption.forEach((line, i) => {
       doc.setFont('times', i === 0 ? 'bold' : 'normal');
-      doc.text(line, MARGIN, cursor.y);
+      doc.text(line, left, cursor.y);
       cursor.y += 12;
     });
     cursor.y += 12;
