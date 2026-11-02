@@ -130,20 +130,13 @@ export async function photoDataUrl(token: string, fileId: string): Promise<strin
 }
 
 /**
- * A small version of a photograph, for the picking grid.
+ * A photograph scaled down, as a data URL.
  *
- * Drive's own thumbnailLink needs the browser's Google session rather than a
- * bearer token, so it cannot be used for files only this app can see. The
- * bytes are fetched once and scaled down here instead; the full-size blob is
- * released immediately, because a folder of two hundred photographs held at
- * full resolution would exhaust the tab.
+ * The bytes are fetched once and the full-size blob released immediately: a
+ * folder of two hundred photographs held at camera resolution would exhaust
+ * the tab, and a document built from them is too heavy to email.
  */
-export async function photoThumbnail(
-  token: string,
-  fileId: string,
-  maxPx = 320
-): Promise<string> {
-  const blob = await downloadPhoto(token, fileId);
+async function scaled(blob: Blob, maxPx: number, quality: number): Promise<string> {
   try {
     const bitmap = await createImageBitmap(blob);
     const scale = Math.min(1, maxPx / Math.max(bitmap.width, bitmap.height));
@@ -154,7 +147,7 @@ export async function photoThumbnail(
     if (!context) throw new Error('no canvas');
     context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close();
-    return canvas.toDataURL('image/jpeg', 0.7);
+    return canvas.toDataURL('image/jpeg', quality);
   } catch {
     // Any failure to scale is not worth losing the picture over.
     return await new Promise((resolve, reject) => {
@@ -164,6 +157,29 @@ export async function photoThumbnail(
       reader.readAsDataURL(blob);
     });
   }
+}
+
+/**
+ * A small version, for the picking grid.
+ *
+ * Drive's own thumbnailLink needs the browser's Google session rather than a
+ * bearer token, so it cannot be used for files only this app can see.
+ */
+export async function photoThumbnail(token: string, fileId: string, maxPx = 320): Promise<string> {
+  return scaled(await downloadPhoto(token, fileId), maxPx, 0.7);
+}
+
+/**
+ * The version that goes into a document.
+ *
+ * A phone camera writes four megabytes a frame, and a document embeds those
+ * bytes as they are - three photographs made an eight-megabyte Word file, so
+ * forty would make one no college could send. 1600px on the long edge is
+ * about 200dpi across half an A4 page, which is more than a printed report
+ * resolves, and brings a photograph to a few hundred kilobytes.
+ */
+export async function photoForPrint(token: string, fileId: string, maxPx = 1600): Promise<string> {
+  return scaled(await downloadPhoto(token, fileId), maxPx, 0.82);
 }
 
 /** Runs the jobs a few at a time, so a big folder does not open 200 requests at once. */

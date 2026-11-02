@@ -10,7 +10,7 @@ import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
 import { useAuth } from '../lib/auth-context';
 import {
-  connectDrive, inBatches, listEventFolders, listPhotos, photoDataUrl, photoThumbnail,
+  connectDrive, inBatches, listEventFolders, listPhotos, photoDataUrl, photoForPrint, photoThumbnail,
   type DriveFolder, type DrivePhoto,
 } from '../lib/drive';
 import {
@@ -140,7 +140,7 @@ export default function Reports() {
         setBusy(`Fetching photograph ${withImages.length + 1} of ${selected.length}…`);
         withImages.push({
           id: photo.id, name: photo.name, takenAt: photo.takenAt,
-          dataUrl: await photoDataUrl(token, photo.id),
+          dataUrl: await photoForPrint(token, photo.id),
         });
       }
       const report: Report = { fields, template, photos: withImages, folderName: folder.name };
