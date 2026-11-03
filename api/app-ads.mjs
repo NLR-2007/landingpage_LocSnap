@@ -51,7 +51,17 @@ export default async function handler(request, response) {
 
   if (request.method === 'GET') {
     try {
-      const { adminDb } = await import('../server/firebase-admin.mjs');
+      const { adminConfigured, adminDb } = await import('../server/firebase-admin.mjs');
+      // No server credentials is a deployment that was never finished, not a
+      // fault at request time. Saying so plainly saves reading logs to find a
+      // missing environment variable.
+      if (!adminConfigured()) {
+        response.setHeader('Cache-Control', 'no-store');
+        return response.status(503).json({
+          error: 'FIREBASE_SERVICE_ACCOUNT is not set on this deployment, so the campaign '
+            + 'cannot be read or saved.'
+        });
+      }
       const snapshot = await adminDb().collection(COLLECTION).doc(DOCUMENT).get();
       const slides = snapshot.exists ? clean(snapshot.data()?.slides) : [];
       return response.status(200).json({ slides });
@@ -59,7 +69,9 @@ export default async function handler(request, response) {
       // Not an empty campaign: the app must tell "nothing is set" apart from
       // "we could not look", and only the first should clear anybody's slot.
       response.setHeader('Cache-Control', 'no-store');
-      return response.status(503).json({ error: 'The campaign could not be read.' });
+      return response.status(503).json({
+        error: `The campaign could not be read: ${error?.message ?? 'unknown error'}`
+      });
     }
   }
 
