@@ -26,6 +26,34 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  /** Whether anybody is being metered yet. Saved on its own, not with the slides. */
+  const [allFree, setAllFree] = useState(true);
+  const [switching, setSwitching] = useState(false);
+
+  async function setMetering(free: boolean) {
+    setSwitching(true);
+    setMessage(null);
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Sign in with an admin Google account to continue.');
+      const response = await fetch('/api/app-ads', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allFree: free }),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.error || `Save failed (${response.status}).`);
+      setAllFree(free);
+      setMessage(free
+        ? 'Every feature is free for everyone. Phones apply this the next time the app opens.'
+        : 'Free allowances are now in force: 10 photos and 1 collage every 8 hours, '
+          + '1 folder, 1 Drive link. Anyone on Pro is unaffected.');
+    } catch (cause) {
+      setMessage((cause as Error).message);
+    } finally {
+      setSwitching(false);
+    }
+  }
   /** What each chosen picture weighs, shown so nobody publishes a 2 MB banner. */
   const [sizes, setSizes] = useState<Record<number, string>>({});
 
@@ -49,6 +77,7 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
       const body = await response.json().catch(() => null);
       if (!response.ok) throw new Error(body?.error || `Request failed (${response.status}).`);
       setSlides(Array.isArray(body?.slides) ? body.slides : []);
+      setAllFree(body?.allFree !== false);
       setState('ready');
     } catch (cause) {
       setMessage((cause as Error).message);
@@ -113,6 +142,28 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
       </p>
 
       {state === 'loading' && <p className="mt-6 text-sm text-ink/60">Loading the campaign…</p>}
+
+      {state === 'ready' && (
+        <div className={`mt-6 rounded-2xl border p-5 ${allFree ? 'border-green/40' : 'border-line'}`}>
+          <p className="font-display text-lg font-medium text-ink">
+            {allFree ? 'Everything is free for everyone' : 'Free allowances are in force'}
+          </p>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink/60">
+            {allFree
+              ? 'No daily limits, no folder or Drive caps. Photos still carry the Geo Snap mark. '
+                + 'Turn this off when you are ready to charge - every phone applies it the next '
+                + 'time the app opens, with no update needed.'
+              : 'Everyone not on Pro gets 10 photos and 1 collage every 8 hours, 1 folder and '
+                + '1 Drive link.'}
+          </p>
+          <button type="button" disabled={switching} onClick={() => void setMetering(!allFree)}
+            className={`mt-4 rounded-full px-6 py-2 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50 ${allFree ? 'border border-line text-ink/80' : 'btn-brand'}`}>
+            {switching
+              ? 'Saving…'
+              : allFree ? 'Start applying free limits' : 'Make everything free again'}
+          </button>
+        </div>
+      )}
 
       {state !== 'loading' && (
         <>

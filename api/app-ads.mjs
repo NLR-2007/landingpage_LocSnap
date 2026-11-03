@@ -19,6 +19,14 @@ import { createHash } from 'node:crypto';
 
 const COLLECTION = 'geo_snap_ads';
 
+/* Settings the app reads alongside the slides.
+ 
+   One document, one request: the app already fetches this on launch, so the
+   switch that decides whether anybody is metered rides along rather than
+   costing a second round trip from every phone in the country. */
+const CONFIG = 'geo_snap_config';
+const CONFIG_DOC = 'app';
+
 /** More than five and the slot stops being a slot. */
 const MAX_SLIDES = 5;
 
@@ -111,9 +119,17 @@ export default async function handler(request, response) {
         });
       }
 
-      const snapshot = await adminDb().collection(COLLECTION).orderBy('order').limit(MAX_SLIDES).get();
+      const db = adminDb();
+      const [snapshot, config] = await Promise.all([
+        db.collection(COLLECTION).orderBy('order').limit(MAX_SLIDES).get(),
+        db.collection(CONFIG).doc(CONFIG_DOC).get()
+      ]);
       const slides = snapshot.docs.map((doc) => forApp(doc.data()));
-      const body = JSON.stringify({ slides });
+      // Free until somebody decides otherwise, including before the document
+      // exists at all. The generous reading is the safe one: the cost of being
+      // wrong is some free use, not a paying user locked out.
+      const allFree = config.exists ? config.data()?.allFree !== false : true;
+      const body = JSON.stringify({ slides, allFree });
       const etag = `"${createHash('sha1').update(body).digest('hex')}"`;
 
       // Re-validated every time rather than held: a campaign changed in the
@@ -156,6 +172,18 @@ export default async function handler(request, response) {
     const { adminDb } = await import('../server/firebase-admin.mjs');
     const db = adminDb();
     const collection = db.collection(COLLECTION);
+
+    // Sent on its own, so saving slides never silently changes who is metered.
+    if (typeof payload.allFree === 'boolean') {
+      await db.collection(CONFIG).doc(CONFIG_DOC).set({
+        allFree: payload.allFree,
+        updatedAt: new Date().toISOString(),
+        updatedBy: admin.email ?? null
+      }, { merge: true });
+      if (!Array.isArray(payload.slides)) {
+        return response.status(200).json({ allFree: payload.allFree });
+      }
+    }
 
     // The whole campaign is replaced at once, so a publish cannot leave the
     // previous slide four behind a new three-slide campaign.

@@ -21,6 +21,19 @@ import { createPayment, feefloReady } from '../lib/feeflo';
 const FREE_POINTS = ['15 clicks', '3 collages', '3 folders', '3 Drive link connections'];
 const FREE_LIMITS = ['Watermark on every photo'];
 
+/* Nothing is for sale yet.
+ 
+   Geo Snap is being given away in full while it earns people's trust, so the
+   paid plans are shown as what is coming rather than hidden: somebody
+   deciding whether to rely on this app should be able to see there is a
+   business behind it, and what it will cost, without being asked for money
+   today.
+ 
+   One constant, so the day it opens is a one-word change. The checkout call
+   is left wired and simply unreachable - code removed and put back is code
+   that has to be tested twice. */
+const SELLING = false;
+
 const PRO_POINTS = [
   'Unlimited clicks',
   'Unlimited collages',
@@ -58,13 +71,17 @@ export default function Plans() {
   return (
     <PageShell title="Plans" eyebrow="Simple and honest" wide>
       <Seo
-        title="Geo Snap - NLR Plans - Free and Pro"
-        description="Geo Snap pricing: Free, Pro for ₹49 per 30 days, or Pro for ₹499 per year. Payments are verified by FeeFlo."
+        title="Geo Snap - NLR Plans"
+        description="Every Geo Snap feature is free right now. Pro is coming later at ₹49 per 30 days or ₹499 per year."
       />
 
       <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/85 sm:text-base">
-        Start free and move to Pro when the limits get in the way. Pay ₹49 for 30 days or ₹499
-        for one year. Both are one-time payments; nothing renews automatically.
+        {SELLING
+          ? 'Start free and move to Pro when the limits get in the way. Pay ₹49 for 30 days or '
+            + '₹499 for one year. Both are one-time payments; nothing renews automatically.'
+          : 'Every feature is free right now - no limits, nothing to pay, nothing to sign up '
+            + 'for. Pro is coming later, and these are the prices it will have. Anything you '
+            + 'capture in the meantime stays yours either way.'}
       </p>
 
       {error && (
@@ -72,7 +89,7 @@ export default function Plans() {
           {error}
         </div>
       )}
-      {!feefloReady && (
+      {SELLING && !feefloReady && (
         <div role="status" className="mt-8 rounded-2xl border border-green/30 bg-green/[0.07] p-5 text-sm leading-relaxed text-ink">
           Checkout is not configured in this environment yet. Prices and features are shown for reference.
         </div>
@@ -151,15 +168,23 @@ export default function Plans() {
           </ul>
 
           <div className="mt-auto pt-8">
-            <Button
-              onClick={() => void buy('LOCSNAP_PRO_MONTHLY')}
-              disabled={busy !== null || !feefloReady}
-              className="btn-brand h-12 w-full rounded-full text-[11px] font-semibold uppercase tracking-[0.18em] disabled:opacity-70"
-            >
-              {busy === 'LOCSNAP_PRO_MONTHLY' ? 'Starting checkout…' : user ? 'Get Pro' : 'Sign in to get Pro'}
-            </Button>
+            {SELLING ? (
+              <Button
+                onClick={() => void buy('LOCSNAP_PRO_MONTHLY')}
+                disabled={busy !== null || !feefloReady}
+                className="btn-brand h-12 w-full rounded-full text-[11px] font-semibold uppercase tracking-[0.18em] disabled:opacity-70"
+              >
+                {busy === 'LOCSNAP_PRO_MONTHLY' ? 'Starting checkout…' : user ? 'Get Pro' : 'Sign in to get Pro'}
+              </Button>
+            ) : (
+              <div className="flex h-12 w-full items-center justify-center rounded-full border border-line text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/55">
+                Coming soon
+              </div>
+            )}
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">
-              Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.
+              {SELLING
+                ? 'Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.'
+                : 'Free to use in full until this opens.'}
             </p>
           </div>
         </article>
@@ -181,13 +206,19 @@ export default function Plans() {
             ))}
           </ul>
           <div className="mt-auto pt-8">
-            <Button
-              onClick={() => void buy('LOCSNAP_PRO_YEARLY')}
-              disabled={busy !== null || !feefloReady}
-              className="btn-brand h-12 w-full rounded-full text-[11px] font-semibold uppercase tracking-[0.18em] disabled:opacity-70"
-            >
-              {busy === 'LOCSNAP_PRO_YEARLY' ? 'Starting checkout…' : user ? 'Get Pro yearly' : 'Sign in to get Pro'}
-            </Button>
+            {SELLING ? (
+              <Button
+                onClick={() => void buy('LOCSNAP_PRO_YEARLY')}
+                disabled={busy !== null || !feefloReady}
+                className="btn-brand h-12 w-full rounded-full text-[11px] font-semibold uppercase tracking-[0.18em] disabled:opacity-70"
+              >
+                {busy === 'LOCSNAP_PRO_YEARLY' ? 'Starting checkout…' : user ? 'Get Pro yearly' : 'Sign in to get Pro'}
+              </Button>
+            ) : (
+              <div className="flex h-12 w-full items-center justify-center rounded-full border border-line text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/55">
+                Coming soon
+              </div>
+            )}
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.</p>
           </div>
         </article>
