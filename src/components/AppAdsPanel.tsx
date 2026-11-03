@@ -104,8 +104,11 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/60">
         Up to {MAX} slides on the app's home screen, shown in this order, five seconds each,
         running forward and then back again. Video plays inside the app and starts muted.
-        Pictures are resized and compressed here, then carried inside the app's campaign, so
-        there is nothing to host. Video needs a Firebase Storage link.
+        Make pictures <strong className="font-medium text-ink/80">1080 x 608</strong> (16:9) -
+        that is the shape of the slot, and anything taller is cropped from the middle, which
+        can cut off wording near the top or bottom. They are resized and compressed here and
+        carried inside the app's campaign, so there is nothing to host. Video needs a Firebase
+        Storage link.
       </p>
 
       {state === 'loading' && <p className="mt-6 text-sm text-ink/60">Loading the campaign…</p>}
