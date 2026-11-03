@@ -7,7 +7,6 @@
    private Vercel env var — never shipped to the browser.
    ========================================================================== */
 import { cert, applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
 let cached;
@@ -46,5 +45,7 @@ export function adminApp() {
   return cached;
 }
 
-export const adminAuth = () => getAuth(adminApp());
+/* adminAuth is gone on purpose: importing firebase-admin/auth drags in
+   jwks-rsa, which require()s the ESM-only jose and throws before any of
+   this runs. Token verification lives in verify-id-token.mjs. */
 export const adminDb = () => getFirestore(adminApp());
