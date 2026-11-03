@@ -135,10 +135,26 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
+      heading: 'Signing In for Pro (Optional, in the App)',
+      paragraphs: [
+        'The camera works without an account. If you choose to sign in from Settings to check a Pro membership, the application asks Google to confirm who you are and exchanges that for a Firebase identity token. That token is sent to our payment service, FeeFlo, which answers only whether the account holds an active plan and when it expires.',
+        'What is stored on your device is the refresh token that keeps you signed in, and the expiry date of any plan found. The expiry is kept so that the application still knows you have paid when it cannot reach the internet. Signing out removes both.',
+        'We receive your Google account identifier and email address through this check. We do not receive your photographs, your folders or your locations, and this sign-in grants no access to your Google Drive — Drive backup is authorised separately and can be refused or withdrawn on its own.',
+      ],
+    },
+    {
       heading: 'Advertising and Cross-Promotion',
       paragraphs: [
-        'Geo Snap - NLR may display promotional content for other products offered by NLR GROUP OF COMPANIES ("house ads"). This content is bundled with the application and shown on your device; it is not served by a third-party advertising network, it uses no advertising identifiers, and it does not track you. Selecting such a promotion opens the relevant product page in your browser, after which that website’s own privacy policy applies.',
+        'Geo Snap - NLR may display promotional content for other products offered by NLR GROUP OF COMPANIES ("house ads"). It is not served by a third-party advertising network, it uses no advertising identifiers, and it does not track you. Selecting such a promotion opens the relevant page in your browser, after which that website’s own privacy policy applies.',
+        'When the application starts it requests this promotional content from our own website at locsnapnlr.vercel.app. The request is an ordinary download of a file that is the same for everybody: it carries no account, no device identifier, no location and no information about you or your photographs, and nothing about you is recorded by us when it is made. The pictures and any video shown are also hosted by us. If the request fails, the application keeps whatever it last received and continues normally.',
         'Geo Snap - NLR does not currently use third-party advertising services. If a third-party advertising service such as Google AdMob is introduced in a future release, those providers may collect information such as device identifiers, advertising identifiers, approximate location, app interactions and diagnostic data. This Privacy Policy will be updated before any such functionality is enabled.',
+      ],
+    },
+    {
+      heading: 'Settings We Send to the Application',
+      paragraphs: [
+        'The same launch request also tells the application which features are currently free and whether any usage allowances apply. This lets us open or restrict features without asking you to install an update. It travels in the same direction as the promotional content — from us to your device — and sends nothing about you, your account or your usage back to us.',
+        'Counts of how many photographs or collages you have made, where any allowance applies, are kept on your device only and are never transmitted.',
       ],
     },
     {
@@ -263,6 +279,15 @@ export const TERMS: LegalDocument = {
       heading: 'Availability',
       paragraphs: [
         'Geo Snap - NLR may change, improve, add or remove features over time. The application is provided subject to availability.',
+      ],
+    },
+    {
+      heading: 'Free Use, and Paid Plans Later',
+      paragraphs: [
+        'Every feature is free at present. There is nothing to buy, and the paid plans shown on our website are not yet on sale.',
+        'This is not permanent. We intend to introduce paid plans, and when we do, some features will carry limits for accounts that have not paid — for example a number of photographs within a period, and caps on how many folders and Google Drive connections may be created. These limits apply to making new things. They do not delete, lock or take away anything you have already created: photographs, folders, collages and Drive connections that exist at that moment remain yours and keep working.',
+        'We may change which features are free, and the size of any allowance, without notice and without issuing an application update — these settings are read from our website. Using the application for a period while it is free does not entitle you to keep that level of access afterwards.',
+        'Nothing you have captured is held to ransom by a plan. Your photographs are files on your own device, and in your own Google Drive if you turned backup on; they remain readable and exportable whatever plan you are on, including if you stop using the application entirely.',
       ],
     },
     {
