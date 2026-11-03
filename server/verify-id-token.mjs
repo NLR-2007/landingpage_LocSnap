@@ -17,20 +17,29 @@ const JWKS = createRemoteJWKSet(
 );
 
 /**
- * The project the token must have been issued for.
+ * The project whose sign-in minted the token.
  *
- * A token is only proof of anything against the project that minted it;
- * without pinning this, a token from any Firebase project would pass.
+ * A token is only proof of anything against the project that issued it;
+ * without pinning this, a token from any Firebase project would verify.
+ *
+ * Deliberately not ENTITLEMENTS_PROJECT_ID. That names where the paid-plan
+ * records are kept, which is allowed to be a different project from the one
+ * people sign in to - and if it ever is, checking tokens against it would
+ * reject every valid administrator.
  */
-function projectId() {
-  if (process.env.ENTITLEMENTS_PROJECT_ID) return process.env.ENTITLEMENTS_PROJECT_ID;
+function authProjectId() {
+  if (process.env.FIREBASE_AUTH_PROJECT_ID) return process.env.FIREBASE_AUTH_PROJECT_ID;
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw).project_id ?? null;
-  } catch {
-    return null;
+  if (raw) {
+    try {
+      const id = JSON.parse(raw).project_id;
+      if (id) return id;
+    } catch {
+      // Falls through to the known project below.
+    }
   }
+  // The project the site and the app both sign in to.
+  return 'geosnap-nlr';
 }
 
 /**
@@ -40,12 +49,7 @@ function projectId() {
  * `email` and `email_verified` need no changes.
  */
 export async function verifyIdToken(token) {
-  const project = projectId();
-  if (!project) {
-    const error = new Error('The server has no Firebase project configured.');
-    error.status = 500;
-    throw error;
-  }
+  const project = authProjectId();
   try {
     const { payload } = await jwtVerify(token, JWKS, {
       issuer: `https://securetoken.google.com/${project}`,
