@@ -8,6 +8,7 @@
    The endpoint refuses a link we do not host, so a mistyped address cannot
    point the app at somebody else's server. */
 import { useCallback, useEffect, useState } from 'react';
+import { prepareBannerImage } from '../lib/banner-image';
 
 type Slide = {
   type: 'image' | 'video';
@@ -24,6 +25,22 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  /** What each chosen picture weighs, shown so nobody publishes a 2 MB banner. */
+  const [sizes, setSizes] = useState<Record<number, string>>({});
+
+  async function attach(index: number, file: File) {
+    setMessage(null);
+    try {
+      const prepared = await prepareBannerImage(file);
+      edit(index, { url: prepared.dataUrl, type: 'image' });
+      setSizes((current) => ({
+        ...current,
+        [index]: `${prepared.width}x${prepared.height}, ${prepared.kilobytes} KB`,
+      }));
+    } catch (cause) {
+      setMessage((cause as Error).message);
+    }
+  }
 
   const load = useCallback(async () => {
     try {
@@ -87,8 +104,8 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/60">
         Up to {MAX} slides on the app's home screen, shown in this order, five seconds each,
         running forward and then back again. Video plays inside the app and starts muted.
-        Upload the file to Firebase Storage and paste its download link - links we do not host
-        are refused.
+        Pictures are resized and compressed here, then carried inside the app's campaign, so
+        there is nothing to host. Video needs a Firebase Storage link.
       </p>
 
       {state === 'loading' && <p className="mt-6 text-sm text-ink/60">Loading the campaign…</p>}
@@ -122,11 +139,30 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
                 </div>
 
                 <label className="mt-3 block text-[11px] font-medium uppercase tracking-[0.12em] text-ink/50">
-                  {slide.type === 'video' ? 'Video link' : 'Picture link'}
+                  {slide.type === 'video' ? 'Video link' : 'Picture'}
                 </label>
-                <input value={slide.url} onChange={(event) => edit(index, { url: event.target.value })}
-                  placeholder="https://firebasestorage.googleapis.com/…"
-                  className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
+                {slide.type === 'video' ? (
+                  <input value={slide.url} onChange={(event) => edit(index, { url: event.target.value })}
+                    placeholder="https://firebasestorage.googleapis.com/…"
+                    className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
+                ) : (
+                  <div className="mt-1 flex flex-wrap items-center gap-3">
+                    <label className="cursor-pointer rounded-full border border-line px-4 py-2 text-xs font-medium text-ink/75">
+                      {slide.url ? 'Choose another' : 'Choose a picture'}
+                      <input type="file" accept="image/*" className="hidden"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          event.target.value = '';
+                          if (file) void attach(index, file);
+                        }} />
+                    </label>
+                    {sizes[index] && (
+                      <span className="text-xs text-ink/55">
+                        {sizes[index]} - every phone downloads this once per change.
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {slide.type === 'video' && (
                   <>
@@ -148,7 +184,7 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
                   placeholder="Read aloud by a screen reader"
                   className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
 
-                {slide.url.trim() && slide.type === 'image' && (
+                {slide.url && slide.type === 'image' && (
                   <img src={slide.url} alt="" className="mt-3 max-h-40 rounded-xl border border-line" />
                 )}
               </div>
