@@ -14,10 +14,11 @@ type Slide = {
   type: 'image' | 'video';
   url: string;
   poster: string | null;
+  link: string | null;
   description: string;
 };
 
-const EMPTY: Slide = { type: 'image', url: '', poster: null, description: '' };
+const EMPTY: Slide = { type: 'image', url: '', poster: null, link: null, description: '' };
 const MAX = 5;
 
 export default function AppAdsPanel({ getToken }: { getToken: () => Promise<string | null> }) {
@@ -178,6 +179,14 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
                       className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
                   </>
                 )}
+
+                <label className="mt-3 block text-[11px] font-medium uppercase tracking-[0.12em] text-ink/50">
+                  Opens when tapped
+                </label>
+                <input value={slide.link ?? ''}
+                  onChange={(event) => edit(index, { link: event.target.value || null })}
+                  placeholder="https://… (leave empty and the slide is not tappable)"
+                  className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
 
                 <label className="mt-3 block text-[11px] font-medium uppercase tracking-[0.12em] text-ink/50">
                   Description

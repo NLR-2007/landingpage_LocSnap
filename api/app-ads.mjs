@@ -45,6 +45,21 @@ function hosted(url) {
   }
 }
 
+/**
+ * Where a slide's tap may send somebody.
+ *
+ * https only, and never a data or intent URL: this is the one field that
+ * reaches outside the app, so what can be written into it stays narrow.
+ */
+function destination(link) {
+  if (typeof link !== 'string' || !link) return null;
+  try {
+    return new URL(link).protocol === 'https:' ? link : null;
+  } catch {
+    return null;
+  }
+}
+
 /** A picture carried inside the campaign itself. */
 function inlinePicture(url) {
   return typeof url === 'string'
@@ -68,6 +83,7 @@ function clean(slides) {
       type: slide.type === 'video' && hosted(slide.url) ? 'video' : 'image',
       url: slide.url,
       poster: usable(slide.poster) ? slide.poster : null,
+      link: destination(slide.link),
       description: String(slide.description ?? '').slice(0, 200)
     }));
 }
@@ -78,6 +94,7 @@ function forApp(slide) {
     type: slide.type,
     url: slide.url,
     poster: slide.poster ?? null,
+    link: slide.link ?? null,
     description: slide.description ?? ''
   };
 }
