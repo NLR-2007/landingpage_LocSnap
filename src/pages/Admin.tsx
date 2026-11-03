@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import AppAdsPanel from '../components/AppAdsPanel';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
@@ -222,6 +223,8 @@ export default function Admin() {
               </tbody>
             </table>
           </div>
+
+          <AppAdsPanel getToken={getToken} />
         </>
       )}
 
