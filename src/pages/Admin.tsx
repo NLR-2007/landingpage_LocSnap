@@ -85,6 +85,17 @@ export default function Admin() {
       });
       const body = await response.json().catch(() => null);
       if (!response.ok) throw new Error(body?.error || `Request failed (${response.status}).`);
+      // A 200 that is not the overview is still a failure. Under `vite dev` the
+      // serverless function is served as source rather than run, which answers
+      // 200 with JavaScript; without this the page set no data, rendered
+      // nothing, and gave no clue why.
+      if (!body || typeof body !== 'object' || !body.totals) {
+        throw new Error(
+          'The server did not return admin data. If this is localhost, the API '
+          + 'functions do not run under `npm run dev` - use `vercel dev`, or the '
+          + 'deployed site.'
+        );
+      }
       setData(body);
       setState('done');
     } catch (cause) {
