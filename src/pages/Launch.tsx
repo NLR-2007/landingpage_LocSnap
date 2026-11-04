@@ -127,7 +127,7 @@ export default function Launch() {
         </p>
 
         <div className="rise" style={{ animationDelay: '250ms' }}>
-          {live ? <Live /> : <Soon onLaunchNow={canPreview ? () => setForced('live') : null} />}
+          {live ? <Live /> : <Soon onLaunchNow={() => setForced('live')} />}
         </div>
 
         {/* The card the app burns into a photograph: a promise beforehand, a
@@ -174,7 +174,7 @@ export default function Launch() {
         </footer>
       </main>
 
-      {forced && (
+      {forced && canPreview && (
         <div className="fixed bottom-4 left-1/2 z-20 -translate-x-1/2">
           <button
             type="button"
@@ -190,31 +190,26 @@ export default function Launch() {
 }
 
 /**
- * The page before the launch instant.
+ * The page before the launch instant: one button, and nothing else.
  *
- * It says when, and that is all. The one control is the preview switch, and
- * it is handed in rather than decided here, because it must never render for
- * an ordinary visitor - a "launch now" button on the live page would be
- * pressed on the morning itself and tell that person the app was out early.
+ * Pressing it reveals the announcement. It is shown to everybody, by the
+ * owner's decision, so anybody who finds the page early can press it and be
+ * told the app is out before it is. The timer still flips the page on its
+ * own at the launch instant, so the button is a way to go early, never the
+ * only way to go at all.
  */
-function Soon({ onLaunchNow }: { onLaunchNow: (() => void) | null }) {
+function Soon({ onLaunchNow }: { onLaunchNow: () => void }) {
   return (
-    <div className="flex flex-col items-center">
-      <p className="inline-flex items-center gap-2.5 rounded-full border border-line bg-card px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/55 shadow-[0_10px_30px_-24px_rgba(27,30,34,0.6)]">
+    <button
+      type="button"
+      onClick={onLaunchNow}
+      className="btn-brand sheen inline-flex items-center gap-3 rounded-full px-10 py-5 text-sm font-semibold uppercase tracking-[0.18em] shadow-[0_18px_40px_-18px_rgba(14,124,145,0.75)] transition hover:-translate-y-0.5"
+    >
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-white/95">
         <PlayMark />
-        On Google Play from 5 November
-      </p>
-
-      {onLaunchNow && (
-        <button
-          type="button"
-          onClick={onLaunchNow}
-          className="btn-brand mt-6 rounded-full px-8 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] transition hover:-translate-y-0.5"
-        >
-          Launch now
-        </button>
-      )}
-    </div>
+      </span>
+      Launch now
+    </button>
   );
 }
 
