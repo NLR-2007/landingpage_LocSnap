@@ -108,17 +108,28 @@ export default function Launch() {
       />
 
       <main className="relative mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-y-6 px-5 py-10 text-center sm:px-8 lg:gap-y-7 lg:py-8">
+        {live && <LaunchedSeal />}
+
         <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#5FD3E6]">
-          {live ? 'Now on Google Play' : 'Launching 5 November 2026'}
+          {live ? 'Successfully launched' : 'Launching 5 November 2026'}
         </p>
 
         <h1 className="font-display text-4xl font-medium leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-          Geo Snap <span className="text-[#5FD3E6]">- NLR</span>
+          {live ? (
+            <>
+              We are <span className="text-[#5FD3E6]">live</span> on Google Play
+            </>
+          ) : (
+            <>
+              Geo Snap <span className="text-[#5FD3E6]">- NLR</span>
+            </>
+          )}
         </h1>
 
         <p className="max-w-xl text-sm leading-relaxed text-[#A9BECD] sm:text-base">
-          A camera that proves where and when. Location, address, coordinates,
-          date and time, burned into the photograph itself.
+          {live
+            ? 'Geo Snap - NLR is out. A camera that proves where and when: location, address, coordinates, date and time, burned into the photograph itself.'
+            : 'A camera that proves where and when. Location, address, coordinates, date and time, burned into the photograph itself.'}
         </p>
 
         {live ? <Live /> : <Countdown left={left} />}
@@ -126,8 +137,8 @@ export default function Launch() {
         {/* The stamp card: before launch it says what will be stamped, after
             launch it is the record of what was. */}
         <figure className="w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-black/35 text-left backdrop-blur">
-          <figcaption className="sr-only">
-            The GPS card Geo Snap burns into every photograph
+          <figcaption className="border-b border-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-[#7D93A5]">
+            {live ? 'Launched at' : 'The card Geo Snap burns into every photograph'}
           </figcaption>
           <div className="flex items-center gap-4 border-l-4 border-[#E8B44A] p-4">
             <div
@@ -220,16 +231,90 @@ function Countdown({ left }: { left: Remaining }) {
   );
 }
 
+
+/**
+ * The seal, pressed onto the page once it is out.
+ *
+ * Confetti would have been the expected choice and would have belonged to
+ * nobody. This app's whole business is stamping a moment onto something, so
+ * the celebration is a stamp: it lands once, slightly crooked, and then sits
+ * there like ink. Anybody who has set their system to reduce motion simply
+ * finds it already landed.
+ */
+function LaunchedSeal() {
+  return (
+    <>
+      <style>{`
+        @keyframes press {
+          0%   { opacity: 0; transform: rotate(-26deg) scale(2.6); }
+          55%  { opacity: .22; transform: rotate(-11deg) scale(.94); }
+          70%  { transform: rotate(-13deg) scale(1.04); }
+          100% { opacity: .16; transform: rotate(-12deg) scale(1); }
+        }
+        .seal { animation: press .9s cubic-bezier(.2,.8,.3,1) .25s both; }
+        @media (prefers-reduced-motion: reduce) {
+          .seal { animation: none; opacity: .16; transform: rotate(-12deg); }
+        }
+      `}</style>
+      <svg
+        aria-hidden
+        viewBox="0 0 400 400"
+        className="seal pointer-events-none absolute right-[4%] top-[14%] w-40 sm:w-52 lg:w-64"
+      >
+        <defs>
+          <path id="sealTop" d="M 62,200 A 138,138 0 0 1 338,200" />
+          <path id="sealBottom" d="M 74,200 A 126,126 0 0 0 326,200" />
+        </defs>
+        <g fill="#5FD3E6" stroke="#5FD3E6">
+          <circle cx="200" cy="200" r="186" fill="none" strokeWidth="10" />
+          <circle cx="200" cy="200" r="166" fill="none" strokeWidth="3" />
+          <text fontFamily="Georgia,serif" fontSize="30" fontWeight="bold"
+                letterSpacing="5" textAnchor="middle" stroke="none">
+            <textPath href="#sealTop" startOffset="50%">GEO SNAP &#183; NLR</textPath>
+          </text>
+          <text fontFamily="Georgia,serif" fontSize="21" fontWeight="bold"
+                letterSpacing="4" textAnchor="middle" stroke="none">
+            <textPath href="#sealBottom" startOffset="50%">05 &#183; 11 &#183; 2026</textPath>
+          </text>
+          <line x1="112" y1="132" x2="288" y2="132" strokeWidth="3.5" />
+          <line x1="112" y1="268" x2="288" y2="268" strokeWidth="3.5" />
+          <text x="200" y="228" fontFamily="Georgia,serif" fontSize="56"
+                fontWeight="bold" textAnchor="middle" stroke="none"
+                letterSpacing="3">LAUNCHED</text>
+        </g>
+      </svg>
+    </>
+  );
+}
+
+/**
+ * The announcement.
+ *
+ * Deliberately a different shape from the countdown rather than the same page
+ * with the timer swapped out: arriving the morning after should feel like
+ * arriving somewhere that has happened, not somewhere that is waiting.
+ */
 function Live() {
   return (
     <div className="flex flex-col items-center">
+      <p className="flex items-center gap-2.5 rounded-full border border-[#35D07F]/35 bg-[#35D07F]/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6BE3A6]">
+        <span className="relative flex h-2 w-2">
+          {/* The only thing still moving on the page, and only faintly. */}
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#35D07F] opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#35D07F]" />
+        </span>
+        Live now
+      </p>
+
       <a
         href={PLAY_STORE_URL}
-        className="rounded-full bg-[#5FD3E6] px-10 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#06202C] transition hover:bg-[#8AE3F2]"
+        className="mt-6 rounded-full bg-[#5FD3E6] px-12 py-5 text-sm font-semibold uppercase tracking-[0.18em] text-[#06202C] shadow-[0_0_40px_-8px_rgba(95,211,230,0.6)] transition hover:bg-[#8AE3F2]"
       >
         Install from Google Play
       </a>
-      <p className="mt-4 text-sm text-[#8FA7B8]">Free &middot; No ads &middot; Android 7.0 and above</p>
+      <p className="mt-4 text-sm text-[#8FA7B8]">
+        Free &middot; No ads &middot; Android 7.0 and above
+      </p>
     </div>
   );
 }
