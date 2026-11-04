@@ -19,13 +19,18 @@ export function BrandMark({ className = 'h-9 w-9' }: { className?: string }) {
   );
 }
 
+/* Ordered the way somebody arriving actually moves: what the app is, what it
+   costs, how to get it, where to ask for help - and only then the legal
+   pages, which nobody comes to the site for but everybody must be able to
+   find. Download sat sixth, behind both legal pages, which put the one link
+   that ends in an install in the hardest place on the bar to notice. */
 const PUBLIC_NAV_LINKS = [
   { label: 'About', to: '/about' },
   { label: 'Plans', to: '/plans' },
+  { label: 'Download', to: '/download' },
+  { label: 'Support', to: '/support' },
   { label: 'Privacy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
-  { label: 'Support', to: '/support' },
-  { label: 'Download', to: '/download' },
 ];
 
 export function useNavLinks() {
