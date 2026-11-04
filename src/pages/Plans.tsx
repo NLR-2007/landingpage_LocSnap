@@ -8,7 +8,7 @@
    page worth tampering with.
    ========================================================================== */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Check, Minus } from 'lucide-react';
 import PageShell from '../components/PageShell';
@@ -18,21 +18,53 @@ import { APP_NAME, CONTACT_EMAIL } from '../data/locsnap';
 import { useAuth } from '../lib/auth-context';
 import { createPayment, feefloReady } from '../lib/feeflo';
 
-const FREE_POINTS = ['15 clicks', '3 collages', '3 folders', '3 Drive link connections'];
+/* The free allowances, as the app actually enforces them.
+
+   These said 15 clicks, 3 collages, 3 folders and 3 Drive links - numbers the
+   app stopped using some releases ago. A plans page that overstates the free
+   tier is not a harmless typo: somebody chooses the app on it and meets a
+   limit they were told they would not. Kept in step with ProAccess.kt. */
+const FREE_POINTS = [
+  '10 clicks every 8 hours',
+  '1 collage every 8 hours',
+  '1 folder',
+  '1 Drive link connection',
+  'No ads',
+];
 const FREE_LIMITS = ['Watermark on every photo'];
 
-/* Nothing is for sale yet.
- 
-   Geo Snap is being given away in full while it earns people's trust, so the
-   paid plans are shown as what is coming rather than hidden: somebody
-   deciding whether to rely on this app should be able to see there is a
-   business behind it, and what it will cost, without being asked for money
-   today.
- 
-   One constant, so the day it opens is a one-word change. The checkout call
-   is left wired and simply unreachable - code removed and put back is code
-   that has to be tested twice. */
-const SELLING = false;
+/* Whether anything is actually for sale, decided in the admin panel.
+
+   This was a constant edited by hand, which meant the switch in the admin
+   panel moved the Android app and left this page behind: phones would begin
+   applying allowances while the website still said Pro was coming later, and
+   the one place a customer goes to pay would refuse to take their money.
+
+   It now reads the same `allFree` flag from the same /api/app-ads document
+   the app reads, so the two cannot disagree. One switch, both surfaces.
+
+   Until the answer arrives - and if the request fails - the page stays shut.
+   Showing a checkout that turns out to be closed is worse than briefly
+   understating what is on offer, and a failed health check is no reason to
+   start asking people for money. */
+function useSelling(): boolean {
+  const [selling, setSelling] = useState(false);
+  useEffect(() => {
+    let live = true;
+    fetch('/api/app-ads')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body) => {
+        if (live && body) setSelling(body.allFree === false);
+      })
+      .catch(() => {
+        /* Leave it closed. */
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return selling;
+}
 
 const PRO_POINTS = [
   'Unlimited clicks',
@@ -41,9 +73,12 @@ const PRO_POINTS = [
   'Unlimited Drive link connections',
   'Documentation export',
   'No watermark',
+  // True of every plan, and charged for on none of them.
+  'No ads',
 ];
 
 export default function Plans() {
+  const selling = useSelling();
   const { user, getToken } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
@@ -76,7 +111,7 @@ export default function Plans() {
       />
 
       <p className="mt-7 max-w-3xl text-sm font-normal leading-relaxed text-ink/85 sm:text-base">
-        {SELLING
+        {selling
           ? 'Start free and move to Pro when the limits get in the way. Pay ₹49 for 30 days or '
             + '₹499 for one year. Both are one-time payments; nothing renews automatically.'
           : 'Every feature is free right now - no limits, nothing to pay, nothing to sign up '
@@ -89,7 +124,7 @@ export default function Plans() {
           {error}
         </div>
       )}
-      {SELLING && !feefloReady && (
+      {selling && !feefloReady && (
         <div role="status" className="mt-8 rounded-2xl border border-green/30 bg-green/[0.07] p-5 text-sm leading-relaxed text-ink">
           Checkout is not configured in this environment yet. Prices and features are shown for reference.
         </div>
@@ -154,7 +189,7 @@ export default function Plans() {
             <span className="text-sm text-ink/60">for 30 days</span>
           </div>
           <p className="mt-5 text-sm leading-relaxed text-ink/80">
-            For field work that does not stop at three folders or fifteen shots. Pay once, use it
+            For field work that does not stop at one folder or ten shots. Pay once, use it
             for a month, pay again only if you want to.
           </p>
 
@@ -168,7 +203,7 @@ export default function Plans() {
           </ul>
 
           <div className="mt-auto pt-8">
-            {SELLING ? (
+            {selling ? (
               <Button
                 onClick={() => void buy('LOCSNAP_PRO_MONTHLY')}
                 disabled={busy !== null || !feefloReady}
@@ -182,7 +217,7 @@ export default function Plans() {
               </div>
             )}
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">
-              {SELLING
+              {selling
                 ? 'Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.'
                 : 'Free to use in full until this opens.'}
             </p>
@@ -206,7 +241,7 @@ export default function Plans() {
             ))}
           </ul>
           <div className="mt-auto pt-8">
-            {SELLING ? (
+            {selling ? (
               <Button
                 onClick={() => void buy('LOCSNAP_PRO_YEARLY')}
                 disabled={busy !== null || !feefloReady}
@@ -219,7 +254,11 @@ export default function Plans() {
                 Coming soon
               </div>
             )}
-            <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.</p>
+            <p className="mt-3 text-center text-xs leading-relaxed text-ink/55">
+              {selling
+                ? 'Secure UPI payment via FeeFlo. The exact amount is shown on the checkout page.'
+                : 'Free to use in full until this opens.'}
+            </p>
           </div>
         </article>
       </div>
