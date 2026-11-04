@@ -11,7 +11,7 @@ export const PLAY_STORE_URL =
 export const LAST_UPDATED = '3 November 2026';
 
 /** The release this site describes. Keep in step with versionName in app/build.gradle.kts. */
-export const APP_VERSION = '2.1.0';
+export const APP_VERSION = '2.2.0';
 
 /** The highlight of the current release, shown on the home page and the About page. */
 export const WHATS_NEW = {

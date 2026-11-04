@@ -5,6 +5,7 @@ import About from './pages/About';
 import Plans from './pages/Plans';
 import Auth from './pages/Auth';
 import Download from './pages/Download';
+import Launch from './pages/Launch';
 import Support from './pages/Support';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/download" element={<Download />} />
+        <Route path="/launch" element={<Launch />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/account" element={<Account />} />
         <Route path="/my-plans" element={<Account />} />
