@@ -7,7 +7,7 @@
    Files are uploaded to Firebase Storage and their download links pasted in.
    The endpoint refuses a link we do not host, so a mistyped address cannot
    point the app at somebody else's server. */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { prepareBannerImage } from '../lib/banner-image';
 
 type Slide = {
@@ -56,6 +56,39 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
   }
   /** What each chosen picture weighs, shown so nobody publishes a 2 MB banner. */
   const [sizes, setSizes] = useState<Record<number, string>>({});
+
+  /* Which slide is being dragged over, so only that one lights up. */
+  const [dropping, setDropping] = useState<number | null>(null);
+  /* The slide a paste should land on: the last picture control touched. */
+  const pasteTarget = useRef<number | null>(null);
+
+  /* A picture pasted from the clipboard goes to the slide last clicked.
+     Windows' file picker can hang for a minute on a cloud-backed folder, and
+     when it does this is the way through that needs no dialog at all. */
+  useEffect(() => {
+    function onPaste(event: ClipboardEvent) {
+      const index = pasteTarget.current;
+      if (index === null) return;
+      const file = Array.from(event.clipboardData?.files ?? [])
+        .find((candidate) => candidate.type.startsWith('image/'));
+      if (!file) return;
+      event.preventDefault();
+      void attach(index, file);
+    }
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+    // attach is stable for the life of the panel.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function dropped(index: number, event: React.DragEvent) {
+    event.preventDefault();
+    setDropping(null);
+    const file = Array.from(event.dataTransfer.files)
+      .find((candidate) => candidate.type.startsWith('image/'));
+    if (file) void attach(index, file);
+    else setMessage('That was not a picture. Drop a PNG or a JPEG.');
+  }
 
   async function attach(index: number, file: File) {
     setMessage(null);
@@ -201,7 +234,15 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
                     placeholder="https://firebasestorage.googleapis.com/…"
                     className="mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-ink" />
                 ) : (
-                  <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <div
+                    onClick={() => { pasteTarget.current = index; }}
+                    onDragOver={(event) => { event.preventDefault(); setDropping(index); }}
+                    onDragLeave={() => setDropping((at) => (at === index ? null : at))}
+                    onDrop={(event) => dropped(index, event)}
+                    className={`mt-1 flex flex-wrap items-center gap-3 rounded-xl border border-dashed p-3 transition ${
+                      dropping === index ? 'border-primary bg-primary/5' : 'border-line'
+                    }`}
+                  >
                     <label className="cursor-pointer rounded-full border border-line px-4 py-2 text-xs font-medium text-ink/75">
                       {slide.url ? 'Choose another' : 'Choose a picture'}
                       <input type="file" accept="image/*" className="hidden"
@@ -211,8 +252,13 @@ export default function AppAdsPanel({ getToken }: { getToken: () => Promise<stri
                           if (file) void attach(index, file);
                         }} />
                     </label>
+                    <span className="text-xs text-ink/55">
+                      {dropping === index
+                        ? 'Let go to use this picture.'
+                        : 'or drag a picture here, or click this box and press Ctrl+V.'}
+                    </span>
                     {sizes[index] && (
-                      <span className="text-xs text-ink/55">
+                      <span className="w-full text-xs text-ink/55">
                         {sizes[index]} - every phone downloads this once per change.
                       </span>
                     )}
