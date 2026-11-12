@@ -47,7 +47,7 @@ export default function Account() {
               </p>
             ) : (
               <p className="mt-2 text-sm leading-relaxed text-ink/75">
-                You are on the Free plan. Upgrade to Pro for unlimited clicks, collages, folders and Drive links, with no watermark.
+                You are on the Free plan. Upgrade to Pro for unlimited clicks, collages, folders and Drive links, and your own logo on every photo.
               </p>
             )}
             <div className="mt-4 flex flex-wrap items-center gap-4">

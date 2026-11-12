@@ -31,7 +31,14 @@ const FREE_POINTS = [
   '1 Drive link connection',
   'No ads',
 ];
-const FREE_LIMITS = ['Watermark on every photo'];
+/* Drawbacks of the free tier, listed against a minus rather than a tick.
+
+   The watermark used to be here. It is on every photo now, paid or not, so it
+   is no longer something Free puts up with - it is how anybody receiving a
+   photo can tell it came from Geo Snap and not from a camera that will write
+   whatever it is told. Selling its removal would have been selling away the
+   reason the photograph is worth anything to the person being shown it. */
+const FREE_LIMITS: string[] = [];
 
 /* Whether anything is actually for sale, decided in the admin panel.
 
@@ -72,7 +79,8 @@ const PRO_POINTS = [
   'Unlimited folders',
   'Unlimited Drive link connections',
   'Documentation export',
-  'No watermark',
+  // Your own mark beside the Geo Snap one, never instead of it.
+  'Your logo on every photo',
   // True of every plan, and charged for on none of them.
   'No ads',
 ];
