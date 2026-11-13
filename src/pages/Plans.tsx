@@ -78,6 +78,10 @@ const PRO_POINTS = [
   'Unlimited collages',
   'Unlimited folders',
   'Unlimited Drive link connections',
+  // Creating one. Joining somebody else's is free on every plan, and the
+  // wording has to make that clear: a teacher's whole class would otherwise
+  // believe they each need to pay.
+  'Run collections for a class or team',
   'Documentation export',
   // Your own mark beside the Geo Snap one, never instead of it.
   'Your logo on every photo',

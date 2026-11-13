@@ -116,6 +116,17 @@ export const PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
+      heading: 'Collections (Optional)',
+      paragraphs: [
+        'A collection lets somebody running an event — a teacher, a site supervisor — gather photographs from a group of people into a folder in their own Google Drive. Nobody is in a collection unless they choose to join one by entering a code, and only the folder they attach it to is affected.',
+        'If you join a collection, every photograph you capture into that folder is uploaded to the organiser’s Google Drive and can be seen by them. Your name and the email address of the Google account you signed in with are recorded as a member of that collection and are visible to the organiser, because the point of a collection is that they can tell who submitted what. Photographs you take in any other folder are not affected and are not shared.',
+        'The photographs do not pass through NLR GROUP OF COMPANIES. Your device asks our website whether a given photograph is permitted, receives a single-use upload address, and sends the file directly to Google over an encrypted connection. We never receive, store or have access to the image.',
+        'What we store about a collection is its name, the identifier of the organiser’s Drive folder, the closing time, and the list of people who joined, with the name and email address of each. We do not keep a record of individual photographs: what has been submitted is read from the organiser’s Drive folder, which already holds that information.',
+        'If you create a collection, you also grant the application permission to create and write to folders in your Google Drive, using the Google “drive.file” permission described above. That authorisation is held by us in encrypted form so that uploads can be permitted while you are not present, and it is used for no other purpose. You may withdraw it at any time through your Google Account permissions page, which immediately stops uploads to every collection you run.',
+        'Once a collection closes, no further uploads are permitted. Photographs already uploaded remain in the organiser’s Drive and are theirs; photographs that were not uploaded remain on your own device and are not sent anywhere. Leaving a collection stops future uploads but does not withdraw what has already been submitted.',
+      ],
+    },
+    {
       heading: 'Google User Data Policy',
       paragraphs: [
         'Geo Snap - NLR’s use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.',
@@ -273,6 +284,17 @@ export const TERMS: LegalDocument = {
         'Uploaded copies are stored in your own Google Drive account, consume your own Google storage quota, and are subject to the Google Terms of Service and Google Privacy Policy. Your use of Google Drive is a matter between you and Google; NLR GROUP OF COMPANIES is not a party to that relationship and does not receive, store or control the uploaded copies.',
         'Backup is provided on a best-effort basis and is not a guaranteed archival service. Uploads require network connectivity and depend on the availability of Google services, your Google storage quota and your continued authorisation. Subject to applicable law, Geo Snap - NLR is not responsible for photographs that fail to upload, for copies deleted from your Google Drive, or for any loss arising from your reliance on this feature as your only backup.',
         'You may disable backup for a folder, remove the connection, delete uploaded copies from Google Drive, or revoke the application’s access to your Google account, at any time.',
+      ],
+    },
+    {
+      heading: 'Collections',
+      paragraphs: [
+        'A collection gathers photographs from a group of people into the Google Drive of whoever created it. Creating one requires a paid plan while allowances are being applied; joining one is free, always will be, and requires no plan of any kind.',
+        'If you create a collection you are responsible for it: for telling the people you invite what it is for, for what is submitted to it, and for handling those photographs and the personal information in them lawfully. Where you are an institution or an employer, that includes any obligation you owe the people submitting. We provide the mechanism; the relationship with your students, staff or contractors is yours.',
+        'If you join a collection, you are choosing to share with its organiser every photograph you take in the folder you attached it to, along with your name and email address. Capture only what the collection is for.',
+        'Photographs uploaded to a collection are created in the organiser’s Google Drive and owned by their Google account. They are subject to Google’s terms and to your arrangement with the organiser. We cannot retrieve, restore or delete them for you, and closing a collection does not remove anything already submitted.',
+        'A collection’s closing time may be extended or brought forward by its organiser, and a collection may be closed early. Once closed, no further uploads are accepted; photographs not uploaded before then remain on the capturing device and are not transmitted.',
+        'We do not guarantee that a submission will arrive. Uploads depend on your network, your device and on Google’s services. The application shows the state of every photograph so that you can see what has and has not been submitted, and you should check it rather than assume. Where a submission matters — for an assessment, a claim or a payment — keep the photographs on your own device until you have confirmed they arrived.',
       ],
     },
     {

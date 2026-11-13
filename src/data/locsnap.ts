@@ -8,7 +8,7 @@ export const PACKAGE_ID = 'com.nlrgroup.locsnap';
 /** Live Google Play listing for the app. */
 export const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.nlrgroup.locsnap&pcampaignid=web_share';
-export const LAST_UPDATED = '3 November 2026';
+export const LAST_UPDATED = '13 November 2026';
 
 /** The release this site describes. Keep in step with versionName in app/build.gradle.kts. */
 export const APP_VERSION = '2.2.0';
