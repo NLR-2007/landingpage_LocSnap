@@ -13,6 +13,9 @@ import {
   refreshTokenFor, listFolder, requireUser, fail
 } from '../../server/collections.mjs';
 
+/** Long enough for a term's project, short enough that nothing lingers. */
+const MAX_DAYS = 180;
+
 /** What the teacher sees about one of their own collections. */
 function summary(doc) {
   const data = doc.data();
@@ -54,8 +57,40 @@ export default async function handler(request, response) {
         // used to discover which codes exist.
         return response.status(404).json({ error: 'No collection has that code.' });
       }
-      await doc.update({ active: payload.active === true });
-      return response.status(200).json({ code, active: payload.active === true });
+
+      const change = {};
+
+      /* Moving the closing time, in either direction.
+
+         Bringing it forward is allowed as well as pushing it back: a class
+         that finished early should be closable, and a teacher who mistyped
+         2027 should not have to live with it. A collection whose deadline has
+         already passed can still be given a new one - that is the whole point
+         of being able to extend. */
+      if (payload.expiresAt !== undefined) {
+        const when = Date.parse(payload.expiresAt ?? '');
+        if (!Number.isFinite(when)) {
+          return response.status(400).json({ error: 'That is not a valid closing time.' });
+        }
+        if (when > Date.now() + MAX_DAYS * 86_400_000) {
+          return response.status(400).json({
+            error: `A collection can stay open for at most ${MAX_DAYS} days.`
+          });
+        }
+        change.expiresAt = new Date(when).toISOString();
+        // Extending a collection that was closed by hand reopens it, which is
+        // what somebody setting a later time plainly means.
+        if (when > Date.now()) change.active = true;
+      }
+
+      if (typeof payload.active === 'boolean') change.active = payload.active;
+
+      if (Object.keys(change).length === 0) {
+        return response.status(400).json({ error: 'Nothing to change.' });
+      }
+
+      await doc.update(change);
+      return response.status(200).json({ code, ...change });
     }
 
     if (request.method !== 'GET') {

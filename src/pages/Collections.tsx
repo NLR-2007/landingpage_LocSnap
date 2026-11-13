@@ -34,14 +34,37 @@ type Person = { email: string; name: string | null; count: number; latest: strin
 type Joined = { email: string; name: string | null; joinedAt: string; submitted: number };
 type Detail = Collection & { total: number; people: Person[]; joined: Joined[] };
 
+/* Always Indian Standard Time, twelve hour.
+
+   A deadline is one shared instant that a teacher and a class have to agree
+   on. Rendered in whatever zone each machine happens to be set to, a teacher
+   abroad and a student in a lecture hall would read different closing times
+   from the same collection, with no way to tell which was meant. */
 function when(value: string | null): string {
   if (!value) return '';
   const date = new Date(value);
   return Number.isNaN(date.getTime())
     ? ''
-    : date.toLocaleString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+    : `${date.toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+      timeZone: 'Asia/Kolkata'
+    })} IST`;
+}
+
+/** An ISO instant as the value a datetime-local input wants, in IST. */
+function forInput(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  }).formatToParts(date).reduce<Record<string, string>>((all, part) => {
+    all[part.type] = part.value;
+    return all;
+  }, {});
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 }
 
 /** Two weeks out, rounded to the hour - a sane default nobody has to think about. */
@@ -66,6 +89,8 @@ export default function Collections() {
 
   const [name, setName] = useState('');
   const [expiresAt, setExpiresAt] = useState(defaultExpiry);
+  /** The collection whose closing time is being changed, and to what. */
+  const [editing, setEditing] = useState<{ code: string; value: string } | null>(null);
 
   const call = useCallback(async (path: string, init?: RequestInit) => {
     const token = await getToken();
@@ -154,6 +179,25 @@ export default function Collections() {
         body: JSON.stringify({ code, active })
       });
       setDetail(null);
+      await load();
+    } catch (cause) {
+      setMessage((cause as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Moves a collection's closing time, later or earlier. */
+  async function reschedule(code: string, local: string) {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const body = await call('/api/collections/mine', {
+        method: 'POST',
+        body: JSON.stringify({ code, expiresAt: new Date(local).toISOString() })
+      });
+      setEditing(null);
+      setMessage(`Now closes ${when(body.expiresAt)}.`);
       await load();
     } catch (cause) {
       setMessage((cause as Error).message);
@@ -285,12 +329,51 @@ export default function Collections() {
                   <a href={item.folderUrl} target="_blank" rel="noreferrer" className="rounded-full border border-line px-4 py-1.5 text-xs font-medium text-ink/75">
                     Open folder
                   </a>
+                  {/* Offered on a closed collection too - reopening one is the
+                      main reason a teacher comes back to this row. */}
+                  <button
+                    type="button"
+                    onClick={() => setEditing(
+                      editing?.code === item.code
+                        ? null
+                        : { code: item.code, value: forInput(item.expiresAt) }
+                    )}
+                    className="rounded-full border border-line px-4 py-1.5 text-xs font-medium text-ink/75"
+                  >
+                    {item.closed ? 'Reopen' : 'Change time'}
+                  </button>
                   {!item.closed && (
                     <button type="button" onClick={() => void setActive(item.code, false)} className="rounded-full border border-line px-4 py-1.5 text-xs font-medium text-[#B3261E]">
                       Close now
                     </button>
                   )}
                 </div>
+
+                {editing?.code === item.code && (
+                  <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-line pt-4">
+                    <label className="text-[11px] font-medium uppercase tracking-[0.12em] text-ink/50">
+                      New closing time (IST)
+                      <input
+                        id={`expiry-${item.code}`}
+                        type="datetime-local"
+                        value={editing.value}
+                        onChange={(event) => setEditing({ code: item.code, value: event.target.value })}
+                        className="mt-1 block rounded-lg border border-line bg-background px-3 py-2 text-sm text-ink"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      disabled={busy || !editing.value}
+                      onClick={() => void reschedule(item.code, editing.value)}
+                      className="btn-brand rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] disabled:opacity-50"
+                    >
+                      Save
+                    </button>
+                    <button type="button" onClick={() => setEditing(null)} className="rounded-full border border-line px-4 py-2 text-xs font-medium text-ink/70">
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
