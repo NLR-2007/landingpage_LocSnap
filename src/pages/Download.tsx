@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
-import { PlayMarkDisc } from '../components/PlayMark';
+import { PlayBadge } from '../components/PlayMark';
 import { APP_NAME, CONTACT_EMAIL, DEVELOPER, PLAY_STORE_URL } from '../data/locsnap';
 
 export default function Download() {
@@ -22,10 +22,10 @@ export default function Download() {
           href={PLAY_STORE_URL}
           target="_blank"
           rel="noreferrer"
-          className="btn-brand inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] sm:text-sm"
+          className="inline-flex transition hover:opacity-90"
+          aria-label="Get it on Google Play"
         >
-          <PlayMarkDisc />
-          Get it on Google Play
+          <PlayBadge className="h-14 sm:h-16" />
         </a>
         <a
           href="/plans"

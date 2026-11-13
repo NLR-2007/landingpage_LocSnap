@@ -27,3 +27,26 @@ export function PlayMarkDisc({ size = 'h-7 w-7' }: { size?: string }) {
     </span>
   );
 }
+
+/**
+ * Google's official "Get it on Google Play" badge.
+ *
+ * Their brand guidelines ask that the supplied artwork be used as it is,
+ * rather than rebuilt from a mark and some type - so this is the file they
+ * publish, unaltered, and sized only by height. It carries its own clear
+ * space inside the image, which is why it needs no padding of its own.
+ *
+ * Preferred over the hand-built button anywhere the point is "install this":
+ * it is the thing people have been trained to recognise.
+ */
+export function PlayBadge({ className = 'h-14' }: { className?: string }) {
+  return (
+    <img
+      src="/google-play-badge.png"
+      alt="Get it on Google Play"
+      width={646}
+      height={250}
+      className={`${className} w-auto`}
+    />
+  );
+}
