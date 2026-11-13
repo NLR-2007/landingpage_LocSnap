@@ -25,7 +25,9 @@ export default function Download() {
           className="inline-flex transition hover:opacity-90"
           aria-label="Get it on Google Play"
         >
-          <PlayBadge className="h-14 sm:h-16" />
+          {/* About a fifth of this is the clear space Google bakes into the
+              file, so it is sized up to sit level with the button beside it. */}
+          <PlayBadge className="h-16 sm:h-[4.5rem]" />
         </a>
         <a
           href="/plans"

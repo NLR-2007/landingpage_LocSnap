@@ -93,7 +93,12 @@ export default function Hero() {
               className="inline-flex transition hover:opacity-90"
               aria-label="Get it on Google Play"
             >
-              <PlayBadge className="h-[3.25rem] sm:h-[3.6rem]" />
+              {/* Taller than the button beside it on purpose. Google bakes
+                  its required clear space into the image, so only about four
+                  fifths of this height is the badge itself - matched on the
+                  CSS height the two would look mismatched, which is exactly
+                  how it looked. */}
+              <PlayBadge className="h-14 sm:h-16" />
             </a>
           </motion.div>
         </div>
