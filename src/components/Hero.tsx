@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
 import StaggeredFade from './StaggeredFade';
 import { PLAY_STORE_URL, WHATS_NEW } from '../data/locsnap';
+import PlayMark from './PlayMark';
 
 export default function Hero() {
   return (
@@ -89,8 +90,11 @@ export default function Hero() {
               href={PLAY_STORE_URL}
               target="_blank"
               rel="noreferrer"
-              className="liquid-glass inline-block rounded-full px-9 py-3.5 text-xs font-medium uppercase tracking-[0.18em] text-ink sm:px-10 sm:py-4 sm:text-sm sm:tracking-[0.2em]"
+              className="liquid-glass inline-flex items-center gap-2.5 rounded-full px-9 py-3.5 text-xs font-medium uppercase tracking-[0.18em] text-ink sm:px-10 sm:py-4 sm:text-sm sm:tracking-[0.2em]"
             >
+              {/* No white disc here: this button is already pale, so the mark
+                  reads on it directly and a disc would be invisible. */}
+              <PlayMark className="h-5 w-5" />
               Get it on Google Play
             </a>
           </motion.div>

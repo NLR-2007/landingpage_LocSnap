@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
+import { PlayMarkDisc } from '../components/PlayMark';
 import { APP_NAME, CONTACT_EMAIL, DEVELOPER, PLAY_STORE_URL } from '../data/locsnap';
 
 export default function Download() {
@@ -23,9 +24,7 @@ export default function Download() {
           rel="noreferrer"
           className="btn-brand inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] sm:text-sm"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-            <path d="M3.6 1.8a1.5 1.5 0 0 0-.5 1.1v18.2a1.5 1.5 0 0 0 .5 1.1l10.1-10.2L3.6 1.8Zm11.6 8.6 3.1-1.8 2.6 1.5a1.6 1.6 0 0 1 0 2.8l-2.6 1.5-3.1-1.8 0-2.2Zm-1.5.9-2.2 2.2 2.2 2.2 2.6-1.5 0-1.4-2.6-1.5Zm1.5-3.6-2.6-1.5-1.4 1.4 2.2 2.2 1.8-2.1Z" />
-          </svg>
+          <PlayMarkDisc />
           Get it on Google Play
         </a>
         <a
