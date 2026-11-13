@@ -14,7 +14,7 @@
    it back. */
 import {
   COLLECTIONS, newCode, accessTokenFor, createFolder,
-  refreshTokenFor, requireUser, fail
+  refreshTokenFor, requireUser, canCreate, fail
 } from '../../server/collections.mjs';
 
 /** Long enough for a term's project, short enough that nothing lingers. */
@@ -65,6 +65,14 @@ export default async function handler(request, response) {
       });
     }
     const db = adminDb();
+
+    if (!await canCreate(db, user)) {
+      return response.status(402).json({
+        error: 'Running a collection needs Geo Snap Pro. Joining one is free - '
+          + 'your students do not need a plan.',
+        needsPro: true
+      });
+    }
 
     const accessToken = await accessTokenFor(await refreshTokenFor(db, user.uid));
     const folder = await createFolder(accessToken, `Geo Snap - ${name}`);

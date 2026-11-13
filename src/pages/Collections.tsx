@@ -272,6 +272,11 @@ export default function Collections() {
       ) : (
         <section className="mt-8 rounded-2xl border border-line bg-card p-6">
           <h2 className="font-display text-lg font-medium">New collection</h2>
+          {/* Said before the attempt, not only as a refusal afterwards. The
+              server decides, so this is a courtesy rather than the rule. */}
+          <p className="mt-1.5 text-xs text-ink/50">
+            Running a collection needs Pro. Your students do not need a plan to join one.
+          </p>
           <form onSubmit={create} className="mt-4 flex flex-wrap items-end gap-4">
             <label className="min-w-[14rem] flex-1 text-[11px] font-medium uppercase tracking-[0.12em] text-ink/50">
               Name

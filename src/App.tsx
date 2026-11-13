@@ -16,6 +16,7 @@ import Admin from './pages/Admin';
 import DriveTest from './pages/DriveTest';
 import Reports from './pages/Reports';
 import Collections from './pages/Collections';
+import Institutions from './pages/Institutions';
 import { AuthProvider } from './lib/auth-context';
 
 function ScrollToTop() {
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="/launch" element={<Launch />} />
         {/* Deliberately not in the nav: a teacher is sent here by a link or by
             us, and a bar item nobody else can use is a bar item in the way. */}
+        <Route path="/institutions" element={<Institutions />} />
         <Route path="/collections" element={<Collections />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/account" element={<Account />} />

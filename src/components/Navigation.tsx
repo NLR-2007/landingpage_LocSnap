@@ -28,6 +28,10 @@ const PUBLIC_NAV_LINKS = [
   { label: 'About', to: '/about' },
   { label: 'Plans', to: '/plans' },
   { label: 'Download', to: '/download' },
+  // After Download rather than before it: the install link stays where
+  // somebody looking for it would look, and this is for the smaller group who
+  // came here to run something rather than to use it.
+  { label: 'Institutions', to: '/institutions' },
   { label: 'Support', to: '/support' },
   { label: 'Privacy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },

@@ -293,7 +293,47 @@ export async function requireUser(request) {
   }
   const { verifyIdToken } = await import('./verify-id-token.mjs');
   const claims = await verifyIdToken(token);
-  return { uid: claims.sub, email: claims.email ?? null, name: claims.name ?? null };
+  return { uid: claims.sub, email: claims.email ?? null, name: claims.name ?? null, token };
+}
+
+/**
+ * Whether this person may open a collection.
+ *
+ * Running one is a Pro thing: it puts a folder in somebody's Drive, holds
+ * their Google authorisation and mints uploads against it for weeks.
+ * *Joining* one is deliberately not - a student should never need an account
+ * of their own, let alone a paid one, to hand work to their teacher.
+ *
+ * While allowances are waived nobody is metered for anything, so creating is
+ * open to all; the same switch that starts charging for folders and captures
+ * starts reserving this too. Checked here rather than in the browser because
+ * a button hidden in the page is not a rule.
+ */
+export async function canCreate(db, user) {
+  const config = await db.collection('geo_snap_config').doc('app').get();
+  // The generous reading on a missing document, matching the app: the cost of
+  // being wrong is somebody getting a feature free, not a paying customer
+  // locked out.
+  const allFree = config.exists ? config.data()?.allFree !== false : true;
+  if (allFree) return true;
+
+  const base = (process.env.FEEFLO_BASE_URL ?? 'https://feeflo.web.app').replace(/\/+$/, '');
+  try {
+    const response = await fetch(`${base}/api/v1/geo-snap/me`, {
+      headers: { Authorization: `Bearer ${user.token}` }
+    });
+    if (!response.ok) return false;
+    const plan = await response.json();
+    if (plan?.uid !== user.uid || plan?.plan !== 'pro') return false;
+    const until = Date.parse(plan?.planExpiresAt ?? '');
+    return Number.isFinite(until) && until > Date.now();
+  } catch {
+    /* The entitlement service is unreachable. Refused rather than allowed:
+       the generous reading above covers the case where nobody is being
+       charged at all, and once they are, a network blip must not quietly
+       hand out the thing being charged for. */
+    return false;
+  }
 }
 
 /** One place that turns a thrown error into a response. */
