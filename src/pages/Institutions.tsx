@@ -59,13 +59,12 @@ export default function Institutions() {
           note="Creating a collection needs Pro. Joining one is free."
         />
         <Card
-          to="/reports"
-          icon={<FileText size={20} className="text-green" />}
+          icon={<FileText size={20} className="text-ink/40" />}
           title="Event documentation"
           lede="Write the report on a keyboard, from the photographs already backed
                 up. Fill in the details and export the PDF or Word file you have to file."
-          cta="Write a report"
           note="Reads from your Drive. Nothing is uploaded to us."
+          soon
         />
       </div>
 
@@ -94,27 +93,63 @@ export default function Institutions() {
   );
 }
 
-function Card({ to, icon, title, lede, cta, note }: {
-  to: string;
+/**
+ * One of the two things this page offers.
+ *
+ * A card marked [soon] is not a link. Describing something in the present
+ * tense and then handing over a page that cannot do it yet is how a teacher
+ * ends up planning a term around a feature that is not there - so it says
+ * what it will do, says it is not ready, and goes nowhere.
+ */
+function Card({ to, icon, title, lede, cta, note, soon = false }: {
+  to?: string;
   icon: React.ReactNode;
   title: string;
   lede: string;
-  cta: string;
+  cta?: string;
   note: string;
+  soon?: boolean;
 }) {
+  const body = (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        {icon}
+        {soon && (
+          <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/55">
+            Launching soon
+          </span>
+        )}
+      </div>
+      <h2 className={`mt-4 font-display text-lg font-medium ${soon ? 'text-ink/70' : ''}`}>
+        {title}
+      </h2>
+      <p className={`mt-2 flex-1 text-sm leading-relaxed ${soon ? 'text-ink/50' : 'text-ink/65'}`}>
+        {lede}
+      </p>
+      <p className="mt-4 text-xs text-ink/45">{note}</p>
+      {!soon && cta && (
+        <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-green">
+          {cta}
+          <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+        </span>
+      )}
+    </>
+  );
+
+  if (soon || !to) {
+    return (
+      <div className="flex flex-col rounded-2xl border border-dashed border-line bg-card/60 p-6">
+        {body}
+      </div>
+    );
+  }
+
   return (
     <Link
       to={to}
       className="group flex flex-col rounded-2xl border border-line bg-card p-6 transition hover:shadow-card"
     >
-      {icon}
-      <h2 className="mt-4 font-display text-lg font-medium">{title}</h2>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-ink/65">{lede}</p>
-      <p className="mt-4 text-xs text-ink/45">{note}</p>
-      <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-green">
-        {cta}
-        <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-      </span>
+      {body}
     </Link>
   );
 }
