@@ -11,20 +11,26 @@ export const PLAY_STORE_URL =
 export const LAST_UPDATED = '13 November 2026';
 
 /** The release this site describes. Keep in step with versionName in app/build.gradle.kts. */
-export const APP_VERSION = '2.2.0';
+export const APP_VERSION = '2.2.1';
 
-/** The highlight of the current release, shown on the home page and the About page. */
+/* The highlight of the current release, shown on the home page and the About
+   page.
+
+   Only ever what is actually on Google Play. Announcing something built but
+   not yet released would send people to the Store for a feature that is not
+   in the version they install, and the first thing they would conclude is
+   that the app is broken. */
 export const WHATS_NEW = {
   version: APP_VERSION,
   date: LAST_UPDATED,
-  headline: 'Optional Google Drive backup',
-  body: "Back up a folder's new photos to your own Google Drive. It is off by default and switched on one folder at a time, so nothing is uploaded unless you ask for it.",
+  headline: 'Drive uploads finish after you close the app',
+  body: 'Push a batch to Drive and walk away. Uploads keep running in the background with a notification counting them down, instead of stopping the moment you leave the app.',
   points: [
-    'Off by default, enabled per folder',
-    'Photos always save on your device first',
-    "The app creates its own GeoSnap folder and can reach nothing else in your Drive",
-    'Uploads wait for a connection and resume on their own',
-    'Turn it off or disconnect at any time',
+    'Uploads continue when the app is closed',
+    'A notification shows how many are left',
+    'A dropped connection resumes on its own',
+    'Your account, plan and email now have their own screen',
+    'Settings reordered so the theme is not buried',
   ],
 };
 
