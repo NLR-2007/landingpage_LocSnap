@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import Seo from '../components/Seo';
-import { APP_NAME, AUDIENCES, DEVELOPER, FEATURES, TAGLINE, WHATS_NEW } from '../data/locsnap';
+import { APP_NAME, AUDIENCES, COMING_NEXT, DEVELOPER, FEATURES, TAGLINE, WHATS_NEW } from '../data/locsnap';
 
 const PROBLEMS: { title: string; body: string }[] = [
   {
@@ -121,6 +121,32 @@ export default function About() {
           {WHATS_NEW.points.map((point) => (
             <li key={point} className="flex gap-2.5 text-sm font-normal leading-relaxed text-ink/70">
               <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
+              {point}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* What is finished but not yet on Google Play.
+
+          Dashed rather than solid, and in muted ink rather than the green
+          used above, so a skim reads the difference between "this is in the
+          app you can install" and "this is coming". Somebody who installs on
+          the strength of this and cannot find it has been misled by us. */}
+      <section className="mt-6 rounded-2xl border border-dashed border-line bg-card/50 p-7 sm:p-9">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-ink/45 sm:text-xs">
+          Coming in version {COMING_NEXT.version} · not released yet
+        </p>
+        <h2 className="font-display mt-3 text-xl font-semibold tracking-tight text-ink/80 sm:text-2xl">
+          {COMING_NEXT.headline}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm font-normal leading-relaxed text-ink/60 sm:text-base">
+          {COMING_NEXT.body}
+        </p>
+        <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+          {COMING_NEXT.points.map((point) => (
+            <li key={point} className="flex gap-2.5 text-sm font-normal leading-relaxed text-ink/55">
+              <span className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full bg-ink/25" />
               {point}
             </li>
           ))}

@@ -34,6 +34,25 @@ export const WHATS_NEW = {
   ],
 };
 
+/* What is built and waiting on a release.
+
+   Written in the future tense and marked as not out yet, because the whole
+   risk of saying anything here is somebody installing the app expecting to
+   find it. Nothing goes in this list that is not already working; it is a
+   note about timing, not a roadmap. */
+export const COMING_NEXT = {
+  version: '2.2.2',
+  headline: 'Collections, and a mark on every photo',
+  body: 'Built and being tested now. A teacher or site supervisor gives out a code, and everything the group photographs into that folder arrives in the organiser’s own Google Drive — no share link, and nobody can reach anybody else’s work.',
+  points: [
+    'Join a class or site collection with an eight-character code',
+    'Photos go straight to the organiser’s Drive, owned by them',
+    'A cloud on every photo shows whether it actually arrived',
+    'The Geo Snap mark on every capture, paid or not, so a photo can be recognised',
+    'Captures refused while a fake-GPS app is reporting the location',
+  ],
+};
+
 /**
  * Production origin, used for canonical URLs, Open Graph tags and the sitemap.
  * This must stay in step with the Privacy Policy URL registered in the Google
