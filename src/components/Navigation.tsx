@@ -34,7 +34,11 @@ const PUBLIC_NAV_LINKS = [
   { label: 'Institutions', to: '/institutions' },
   { label: 'Support', to: '/support' },
   { label: 'Privacy', to: '/privacy' },
-  { label: 'Terms & Conditions', to: '/terms' },
+  // "Terms", not "Terms & Conditions": at this tracking it was half again as
+  // wide as any other item and was most of what pushed the bar past the
+  // width it had. Nobody has ever failed to find terms because they were
+  // labelled Terms.
+  { label: 'Terms', to: '/terms' },
 ];
 
 export function useNavLinks() {
@@ -53,7 +57,10 @@ export default function Navigation() {
   return (
     <>
       <nav className="relative z-20 flex items-center justify-between px-5 py-6 sm:px-8 lg:justify-center lg:gap-10 xl:gap-14">
-        <Link to="/" className="group flex items-center gap-2.5 leading-tight">
+        {/* shrink-0: the links are whitespace-nowrap and will not give, so
+            without this the brand is what gets squeezed, and the product's
+            own name ends up truncated to "GEO SNAP - ...". */}
+        <Link to="/" className="group flex shrink-0 items-center gap-2.5 leading-tight">
           <BrandMark />
           <span className="leading-tight">
             <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-ink sm:text-base">
@@ -66,7 +73,7 @@ export default function Navigation() {
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-6 xl:gap-9">
+        <div className="hidden lg:flex min-w-0 items-center gap-5 xl:gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.to}
